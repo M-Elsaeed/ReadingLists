@@ -15,7 +15,7 @@ export default function BookCard({
 }
 ) {
   return (
-    <Card className='transparent-Card' sx={{ maxWidth: 345 }}>
+    <Card className='transparent-Card' sx={{ maxWidth: 200 }}>
       <CardMedia
         sx={{ height: 250 }}
         image={bookCoverLink}
@@ -25,13 +25,13 @@ export default function BookCard({
         <Typography gutterBottom variant="h5" component="div">
           {bookTitle}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2">
           Author: {bookAuthor}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2">
           ISBN: {bookISBN}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2">
           Status: {bookStatus}
         </Typography>
       </CardContent>

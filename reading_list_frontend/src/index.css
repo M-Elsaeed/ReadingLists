@@ -11,6 +11,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  min-width: 100%;
 }
 
 .transparent-Card {
@@ -23,6 +25,7 @@
 
 .left-aligned-text{
   text-align: left !important;
+  color: antiquewhite;
 }
 
 a {
