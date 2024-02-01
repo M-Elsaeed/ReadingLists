@@ -4,6 +4,9 @@ import BookList from "./Components/BookList.jsx";
 import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
 
+const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
+console.log(ListsAPIEndpoint)
+
 // A custom hook to fetch data from a given URL
 const useFetch = (url) => {
 	const [data, setData] = useState(null);
@@ -21,7 +24,7 @@ const useFetch = (url) => {
 				setLoading(false);
 			}
 		};
-		fetchData();
+		fetchData();``
 	}, [url]);
 
 	return { data, loading, error };
@@ -39,7 +42,7 @@ const App = () => {
 
 
 	// Fetch the data from the API
-	const { data, loading } = useFetch("http://127.0.0.1:3000/reading-lists");
+	const { data, loading } = useFetch(`${ListsAPIEndpoint}/reading-lists`);
 
 	// Initialize the lists state with the fetched data
 	useEffect(() => {
@@ -70,7 +73,7 @@ const App = () => {
 		// Post the new book to the API
 
 		axios.post(
-			`http://127.0.0.1:3000/reading-lists/${listID}/books`,
+			`${ListsAPIEndpoint}/reading-lists/${listID}/books`,
 			{ book: newBook }
 		)
 			.then((res) => {
@@ -90,7 +93,7 @@ const App = () => {
 		// Delete the book from the API
 		try {
 			await axios.delete(
-				`http://127.0.0.1:3000/reading-lists/${selectedList}/books/${isbn}`
+				`${ListsAPIEndpoint}/reading-lists/${selectedList}/books/${isbn}`
 			);
 			// Update the lists state by removing the deleted book
 			delete lists[selectedList].books[isbn];
@@ -112,7 +115,7 @@ const App = () => {
 				image
 			}
 			await axios.put(
-				`http://127.0.0.1:3000/reading-lists/${selectedList}/books/${isbn}`,
+				`${ListsAPIEndpoint}/reading-lists/${selectedList}/books/${isbn}`,
 				{
 					book: newBook
 				}
@@ -135,7 +138,7 @@ const App = () => {
 	const handleDeleteList = (e) => {
 		e.preventDefault();
 		if (confirm("Are you sure you want to delete this list?")) {
-			axios.delete(`http://127.0.0.1:3000/reading-lists/${selectedList}`)
+			axios.delete(`${ListsAPIEndpoint}/reading-lists/${selectedList}`)
 				.then((res) => {
 					setSelectedList(null)
 					setError(null)
@@ -148,7 +151,7 @@ const App = () => {
 
 	const handleNewList = (e) => {
 		e.preventDefault();
-		axios.post(`http://127.0.0.1:3000/reading-lists/`, { name: newListName })
+		axios.post(`${ListsAPIEndpoint}/reading-lists/`, { name: newListName })
 			.then((res) => {
 				setSelectedList(res.data.id)
 				setError(null)
@@ -160,7 +163,7 @@ const App = () => {
 
 	const handleEditList = (e) => {
 		e.preventDefault();
-		axios.put(`http://127.0.0.1:3000/reading-lists/${selectedList}`, { name: editedListName })
+		axios.put(`${ListsAPIEndpoint}/reading-lists/${selectedList}`, { name: editedListName })
 			.then((res) => {
 				setSelectedList(res.data.id)
 				setError(null)
