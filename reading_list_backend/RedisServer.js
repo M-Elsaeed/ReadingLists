@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const client = redis.createClient({
-	password: 'Z4BpvcJpcFaXULRYsQylHchJ28LqlG4O', // move to env
+	password: process.env.redis_password,
 	socket: {
 		host: 'redis-18179.c243.eu-west-1-3.ec2.cloud.redislabs.com',
 		port: 18179
@@ -42,8 +42,9 @@ const cleanBookISBN = (bookISBN) => {
 };
 
 app.get('/', (req, res) => {
-	client.json.set(rootKeyName, '$.readingListID', { listName: "some listName", books: { "bookIDisisbn": { "isbn": "bookisbn", "author": "some author", "title": "some title" } } }, (err, reply) => { });
-	res.send('Hello World!');
+	client.json.get(rootKeyName)
+	.then(result => res.send(result))
+	.catch(err => res.send(err))
 });
 
 app.post('/reading-lists', (req, res) => {
