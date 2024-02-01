@@ -1,3 +1,6 @@
+// hosted at https://readinglists.onrender.com/
+// manage at https://dashboard.render.com/
+
 const express = require('express');
 const redis = require('redis');
 const bodyParser = require('body-parser');
