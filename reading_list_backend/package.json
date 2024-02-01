@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha ./Server.test.js"
   },
   "keywords": [
     "Kargo",
@@ -17,6 +17,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
-    "redis": "^4.6.12"
+    "mocha": "^10.2.0",
+    "redis": "^4.6.12",
+    "supertest": "^6.3.4"
   }
 }
