@@ -5,6 +5,7 @@ const BookForm = ({ onAdd, listID }) => {
 	const [isbn, setIsbn] = useState("");
 	const [title, setTitle] = useState("");
 	const [author, setAuthor] = useState("");
+	const [imageURL, setimageURL] = useState("https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg");
 	const [status, setStatus] = useState("Unread");
 
 	const handleSubmit = (e) => {
@@ -13,6 +14,7 @@ const BookForm = ({ onAdd, listID }) => {
 		setIsbn("");
 		setTitle("");
 		setAuthor("");
+		setimageURL("https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg");
 		setStatus("Unread");
 	};
 
@@ -59,6 +61,14 @@ const BookForm = ({ onAdd, listID }) => {
 					value={author}
 					onChange={handleChange}
 					required
+				/>
+				<label htmlFor="imageURL">Cover URL:</label>
+				<input
+					type="text"
+					id="imageURL"
+					name="imageURL"
+					value={imageURL}
+					onChange={handleChange}
 				/>
 				<label htmlFor="status">Status:</label>
 				<select

@@ -33,6 +33,10 @@ const App = () => {
 	const [lists, setLists] = useState(null);
 	const [selectedList, setSelectedList] = useState(null);
 	const [error, setError] = useState(null);
+	const [newListName, setNewListName] = useState("Your new list name");
+	const [editedListName, setEditedListName] = useState("Your edited list name");
+	const [editedListNameMode, setEditListNameMode] = useState(false);
+
 
 	// Fetch the data from the API
 	const { data, loading } = useFetch("http://127.0.0.1:3000/reading-lists");
@@ -54,7 +58,7 @@ const App = () => {
 			setError("The book with this ISBN already exists in the list.");
 			return;
 		}
-		if(!image) image = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+		if (!image) image = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
 		// Create a new book object
 		const newBook = {
 			isbn,
@@ -122,9 +126,54 @@ const App = () => {
 
 	// Handle changing the selected list
 	const handleChangeList = (e) => {
+		e.preventDefault();
 		const listId = e.target.value;
 		setSelectedList(listId);
 	};
+
+	// Handle changing the selected list
+	const handleDeleteList = (e) => {
+		e.preventDefault();
+		if (confirm("Are you sure you want to delete this list?")) {
+			axios.delete(`http://127.0.0.1:3000/reading-lists/${selectedList}`)
+				.then((res) => {
+					setSelectedList(null)
+					setError(null)
+				})
+				.catch((err) => {
+					setError(err.message)
+				})
+		}
+	};
+
+	const handleNewList = (e) => {
+		e.preventDefault();
+		axios.post(`http://127.0.0.1:3000/reading-lists/`, { name: newListName })
+			.then((res) => {
+				setSelectedList(res.data.id)
+				setError(null)
+			})
+			.catch((err) => {
+				setError(err.message)
+			})
+	}
+
+	const handleEditList = (e) => {
+		e.preventDefault();
+		axios.put(`http://127.0.0.1:3000/reading-lists/${selectedList}`, { name: editedListName })
+			.then((res) => {
+				setSelectedList(res.data.id)
+				setError(null)
+			})
+			.catch((err) => {
+				setError(err.message)
+			})
+	}
+
+	const handeToggleEditMode = (e) => {
+		e.preventDefault()
+		setEditListNameMode(!editedListNameMode)
+	}
 
 	return (
 		<div className="app">
@@ -132,17 +181,40 @@ const App = () => {
 				loading ? <p>Loading</p> :
 					<>
 						<h1>My Reading Lists</h1>
-						<select onChange={handleChangeList}>
-							{lists && Object.keys(lists).map((listKey) => (
-								<option key={listKey} value={listKey}>
-									{lists[listKey].listName}
-								</option>
-							))}
-						</select>
+						<div>
+							<label>
+								Selected Reading List:
+								<select onChange={handleChangeList}>
+									{lists && Object.keys(lists).map((listKey) => (
+										<option key={listKey} value={listKey}>
+											{lists[listKey].listName}
+										</option>
+									))}
+								</select>
+							</label>
+							{editedListNameMode &&
+								<form>
+									<label>
+										Edited List Name:
+										<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
+									</label>
+									<button onClick={handleEditList}>Confirm Edit</button>
+								</form>
+							}
+							{selectedList && <button onClick={handeToggleEditMode}>Edit Selected Reading List Name</button>}
+							{selectedList && <button onClick={handleDeleteList}>Delete Selected Reading List</button>}
+							<form>
+								<label>
+									New List Name:
+									<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
+								</label>
+								<button onClick={handleNewList}>Create a New Reading List</button>
+							</form>
+						</div>
 						{selectedList && <SearchBar listID={selectedList} onAdd={handleAddBook}></SearchBar>}
 						{selectedList && <BookForm listID={selectedList} onAdd={handleAddBook} />}
 						{error && <p className="error">{error}</p>}
-						{lists && selectedList && (
+						{lists && selectedList && lists[selectedList] && (
 							<BookList
 								list={lists[selectedList]}
 								onDelete={handleDeleteBook}

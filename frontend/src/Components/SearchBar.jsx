@@ -86,6 +86,7 @@ const SearchBar = ({ onAdd, listID }) => {
 
 	// A handler function to clear the selected state and the form
 	const handleClear = () => {
+		setQuery("");
 		setSelected(null);
 	};
 
@@ -113,42 +114,11 @@ const SearchBar = ({ onAdd, listID }) => {
 								book={result}
 								editableCard={false}
 							/>
-
-							{/* {result.image && <img src={result.image} alt={result.title} />}
-							<div className="info">
-								<h3>{result.title}</h3>
-								{result.subtitle && <h4>{result.subtitle}</h4>}
-								{result.author && <p>By {result.author}</p>}
-								{result.isbn && <p>ISBN: {result.isbn}</p>}
-							</div> */}
 						</div>
 					))}
 				</div>
 			)}
-			{selected && (
-				<div className="form">
-					<h2>Selected Book</h2>
-					<p>
-						<strong>Title:</strong> {selected.title}
-					</p>
-					{selected.subtitle && (
-						<p>
-							<strong>Subtitle:</strong> {selected.subtitle}
-						</p>
-					)}
-					{selected.author && (
-						<p>
-							<strong>Author:</strong> {selected.author}
-						</p>
-					)}
-					{selected.isbn && (
-						<p>
-							<strong>ISBN:</strong> {selected.isbn}
-						</p>
-					)}
-					<button onClick={handleClear}>Clear</button>
-				</div>
-			)}
+			<button onClick={handleClear}>Clear</button>
 		</div>
 	);
 };
