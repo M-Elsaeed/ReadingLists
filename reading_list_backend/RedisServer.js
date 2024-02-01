@@ -8,7 +8,7 @@ const { randomUUID } = require('crypto');
 // Create an express app and a redis client
 const app = express();
 const client = redis.createClient({
-	password: 'Z4BpvcJpcFaXULRYsQylHchJ28LqlG4O',
+	password: 'Z4BpvcJpcFaXULRYsQylHchJ28LqlG4O', // move to env
 	socket: {
 		host: 'redis-18179.c243.eu-west-1-3.ec2.cloud.redislabs.com',
 		port: 18179
@@ -26,8 +26,8 @@ const handleError = (err, res) => {
 
 // Define a helper function to validate book data
 const validateBook = (book) => {
-	// Check if the book has ISBN, title, and author properties
-	if (!book.ISBN || !book.title || !book.author) {
+	// Check if the book has isbn, title, and author properties
+	if (!book.isbn || !book.title || !book.author) {
 		return false;
 	}
 	// Check if the book status is one of the valid values
@@ -40,7 +40,7 @@ const validateBook = (book) => {
 };
 
 app.get('/', (req, res) => {
-	client.json.set(rootKeyName, '$.readingListID', { listName: "some listName", books: { "bookIDisISBN": { "isbn": "bookisbn", "author": "some author", "title": "some title" } } }, (err, reply) => { });
+	client.json.set(rootKeyName, '$.readingListID', { listName: "some listName", books: { "bookIDisisbn": { "isbn": "bookisbn", "author": "some author", "title": "some title" } } }, (err, reply) => { });
 	res.send('Hello World!');
 });
 
@@ -62,7 +62,7 @@ app.post('/reading-lists', (req, res) => {
 
 // Define a route to get all reading lists
 app.get('/reading-lists', (req, res) => {
-	client.json.get(rootKeyName, `$`)
+	client.json.get(rootKeyName)
 		.then(allLists => {
 			res.status(200).send(allLists);
 		})
@@ -76,7 +76,7 @@ app.get('/reading-lists/:id', (req, res) => {
 	// Get the id from the request params
 	const id = req.params.id;
 	// Get the details of the reading list from the redis database
-	client.json.get(rootKeyName, `$.${id}`)
+	client.json.get(rootKeyName, { path: `$.${id}` })
 		.then(list => {
 			if (!list) {
 				return res.status(404).send('Reading list not found');
@@ -98,38 +98,33 @@ app.put('/reading-lists/:id', (req, res) => {
 	if (!name) {
 		return res.status(400).send('Name is required');
 	}
-	// Update the name of the reading list in the redis database
-	client.hset(id, 'name', name, (err, reply) => {
-		// Handle any errors
-		if (err) {
-			return handleError(err, res);
-		}
-		// Check if the list exists
-		if (reply === 0) {
-			return res.status(404).send('Reading list not found');
-		}
-		// Send a success response with the id and name of the reading list
-		res.status(200).send({ id, name });
-	});
+
+	client.json.set(rootKeyName, `$.${id}.listName`, name)
+		.then((setVerdict) => {
+
+			if (!setVerdict) {
+				return res.status(404).send('Reading list not found');
+			}
+
+			res.status(201).send({ id, name })
+		})
+		.catch((err) => handleError(err, res));
 });
 
 // Define a route to delete a reading list by id
 app.delete('/reading-lists/:id', (req, res) => {
 	// Get the id from the request params
 	const id = req.params.id;
-	// Delete the reading list from the redis database
-	client.del(id, (err, reply) => {
-		// Handle any errors
-		if (err) {
-			return handleError(err, res);
-		}
-		// Check if the list exists
-		if (reply === 0) {
-			return res.status(404).send('Reading list not found');
-		}
-		// Send a success response with a message
-		res.status(200).send('Reading list deleted');
-	});
+	client.json.del(rootKeyName, `$.${id}`)
+		.then((deleteVerdict) => {
+
+			if (!deleteVerdict) {
+				return res.status(404).send('Reading list not found');
+			}
+
+			res.status(201).send(`deleted ${id}`)
+		})
+		.catch((err) => handleError(err, res));
 });
 
 // Define a route to add a book to a reading list by id
@@ -146,86 +141,41 @@ app.post('/reading-lists/:id/books', (req, res) => {
 	if (!validateBook(book)) {
 		return res.status(400).send('Book is invalid');
 	}
-	// Get the books array of the reading list from the redis database
-	client.hget(id, 'books', (err, books) => {
-		// Handle any errors
-		if (err) {
-			return handleError(err, res);
-		}
-		// Check if the list exists
-		if (!books) {
-			return res.status(404).send('Reading list not found');
-		}
-		// Parse the books array
-		books = JSON.parse(books);
-		// Add the book to the books array
-		books.push(book);
-		// Update the books array of the reading list in the redis database
-		client.hset(id, 'books', JSON.stringify(books), (err, reply) => {
-			// Handle any errors
-			if (err) {
-				return handleError(err, res);
+
+	// check not already exists
+	client.json.set(rootKeyName, `$.${id}.books.${book.isbn}`, book, { NX: true })
+		.then((addVerdict) => {
+			if (!addVerdict) {
+				return res.status(404).send('Failed to add, book already exists or reading list does not exist.');
 			}
-			// Send a success response with the book
-			res.status(201).send(book);
+
+			res.status(201).send(`Added Books ${book.isbn} to list ${id}`)
+		})
+		.catch((err) => handleError(err, res));
+});
+
+// Define a route to get a single book from a reading list by id and isbn
+app.get('/reading-lists/:id/books/:isbn', (req, res) => {
+	// Get the id and isbn from the request params
+	const id = req.params.id;
+	const isbn = req.params.isbn;
+	client.json.get(rootKeyName, { path: `$.${id}.books.${isbn}` })
+		.then(book => {
+			if (!book) {
+				return res.status(404).send('Reading list or book not found');
+			}
+			res.status(200).send(book);
+		})
+		.catch(err => {
+			return handleError(err, res);
 		});
-	});
 });
 
-// Define a route to get all books from a reading list by id
-app.get('/reading-lists/:id/books', (req, res) => {
-	// Get the id from the request params
+// Define a route to update a book in a reading list by id and isbn
+app.put('/reading-lists/:id/books/:isbn', (req, res) => {
+	// Get the id and isbn from the request params
 	const id = req.params.id;
-	// Get the books array of the reading list from the redis database
-	client.hget(id, 'books', (err, books) => {
-		// Handle any errors
-		if (err) {
-			return handleError(err, res);
-		}
-		// Check if the list exists
-		if (!books) {
-			return res.status(404).send('Reading list not found');
-		}
-		// Parse the books array
-		books = JSON.parse(books);
-		// Send a success response with the books array
-		res.status(200).send(books);
-	});
-});
-
-// Define a route to get a single book from a reading list by id and ISBN
-app.get('/reading-lists/:id/books/:ISBN', (req, res) => {
-	// Get the id and ISBN from the request params
-	const id = req.params.id;
-	const ISBN = req.params.ISBN;
-	// Get the books array of the reading list from the redis database
-	client.hget(id, 'books', (err, books) => {
-		// Handle any errors
-		if (err) {
-			return handleError(err, res);
-		}
-		// Check if the list exists
-		if (!books) {
-			return res.status(404).send('Reading list not found');
-		}
-		// Parse the books array
-		books = JSON.parse(books);
-		// Find the book with the matching ISBN
-		const book = books.find(book => book.ISBN === ISBN);
-		// Check if the book exists
-		if (!book) {
-			return res.status(404).send('Book not found');
-		}
-		// Send a success response with the book
-		res.status(200).send(book);
-	});
-});
-
-// Define a route to update a book in a reading list by id and ISBN
-app.put('/reading-lists/:id/books/:ISBN', (req, res) => {
-	// Get the id and ISBN from the request params
-	const id = req.params.id;
-	const ISBN = req.params.ISBN;
+	const isbn = req.params.isbn;
 	// Get the book from the request body
 	const book = req.body.book;
 	// Check if the book is provided
@@ -236,36 +186,16 @@ app.put('/reading-lists/:id/books/:ISBN', (req, res) => {
 	if (!validateBook(book)) {
 		return res.status(400).send('Book is invalid');
 	}
-	// Get the books array of the reading list from the redis database
-	client.hget(id, 'books', (err, books) => {
-		// Handle any errors
-		if (err) {
-			return handleError(err, res);
-		}
-		// Check if the list exists
-		if (!books) {
-			return res.status(404).send('Reading list not found');
-		}
-		// Parse the books array
-		books = JSON.parse(books);
-		// Find the index of the book with the matching ISBN
-		const index = books.findIndex(book => book.ISBN === ISBN);
-		// Check if the book exists
-		if (index === -1) {
-			return res.status(404).send('Book not found');
-		}
-		// Replace the book at the index with the new book
-		books[index] = book;
-		// Update the books array of the reading list in the redis database
-		client.hset(id, 'books', JSON.stringify(books), (err, reply) => {
-			// Handle any errors
-			if (err) {
-				return handleError(err, res);
+
+	client.json.set(rootKeyName, `$.${id}.books.${book.isbn}`, book, { XX: true })
+		.then((addVerdict) => {
+			if (!addVerdict) {
+				return res.status(404).send('Failed to modify book, check book isbn or reading list does not exist.');
 			}
-			// Send a success response with the book
-			res.status(200).send(book);
-		});
-	});
+
+			res.status(201).send(`Updated Books ${book.isbn}`)
+		})
+		.catch((err) => handleError(err, res));
 });
 
 client.connect()
