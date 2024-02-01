@@ -36,6 +36,11 @@ const validateBook = (book) => {
 	return true;
 };
 
+const cleanBookISBN = (bookISBN) => {
+	// trimmed alphanumeric string only.
+	return bookISBN.trim().replace(/[^a-z0-9]/gi, '');
+};
+
 app.get('/', (req, res) => {
 	client.json.set(rootKeyName, '$.readingListID', { listName: "some listName", books: { "bookIDisisbn": { "isbn": "bookisbn", "author": "some author", "title": "some title" } } }, (err, reply) => { });
 	res.send('Hello World!');
@@ -116,7 +121,7 @@ app.post('/reading-lists/:id/books', (req, res) => {
 		return res.status(400).send('Book is invalid');
 	}
 
-	client.json.set(rootKeyName, `$.${id}.books["${book.isbn}"]`, book, { NX: true })
+	client.json.set(rootKeyName, `$.${id}.books["${cleanBookISBN(book.isbn)}"]`, book, { NX: true })
 		.then((addVerdict) => {
 			if (!addVerdict) {
 				return res.status(404).send('Failed to add, book already exists or reading list does not exist.');
@@ -128,8 +133,8 @@ app.post('/reading-lists/:id/books', (req, res) => {
 
 app.get('/reading-lists/:id/books/:isbn', (req, res) => {
 	const id = req.params.id;
-	const isbn = req.params.isbn;
-	client.json.get(rootKeyName, { path: `$.${id}.books["${isbn}"]` })
+	const bookisbn = cleanBookISBN(req.params.isbn);
+	client.json.get(rootKeyName, { path: `$.${id}.books["${bookisbn}"]` })
 		.then(book => {
 			if (!book) {
 				return res.status(404).send('Reading list or book not found');
@@ -143,8 +148,8 @@ app.get('/reading-lists/:id/books/:isbn', (req, res) => {
 
 app.put('/reading-lists/:id/books/:isbn', (req, res) => {
 	const id = req.params.id;
-	const isbn = req.params.isbn;
 	const book = req.body.book;
+	const bookisbn = cleanBookISBN(req.params.isbn);
 	if (!book) {
 		return res.status(400).send('Book is required');
 	}
@@ -152,19 +157,19 @@ app.put('/reading-lists/:id/books/:isbn', (req, res) => {
 		return res.status(400).send('Book is invalid');
 	}
 
-	client.json.set(rootKeyName, `$.${id}.books["${book.isbn}"]`, book, { XX: true })
+	client.json.set(rootKeyName, `$.${id}.books["${bookisbn}"]`, book, { XX: true })
 		.then((addVerdict) => {
 			if (!addVerdict) {
 				return res.status(404).send('Failed to modify book, check book isbn or reading list does not exist.');
 			}
-			res.status(201).send(`Updated Books ${book.isbn}`)
+			res.status(201).send(`Updated Books ${bookisbn}`)
 		})
 		.catch((err) => handleError(err, res));
 });
 
 app.delete('/reading-lists/:id/books/:bookisbn', (req, res) => {
 	const id = req.params.id;
-	const bookisbn = req.params.bookisbn;
+	const bookisbn = cleanBookISBN(req.params.bookisbn);
 	client.json.del(rootKeyName, `$.${id}.books["${bookisbn}"]`)
 		.then((deleteVerdict) => {
 			if (!deleteVerdict) {
