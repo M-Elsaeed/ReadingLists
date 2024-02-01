@@ -2,11 +2,14 @@
 const express = require('express');
 const redis = require('redis');
 const bodyParser = require('body-parser');
-const rootKeyName = 'ReadingLists';
+const cors = require('cors');
 const { randomUUID } = require('crypto');
+const rootKeyName = 'ReadingLists';
 
 // Create an express app and a redis client
 const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 const client = redis.createClient({
 	password: 'Z4BpvcJpcFaXULRYsQylHchJ28LqlG4O', // move to env
 	socket: {
@@ -15,8 +18,6 @@ const client = redis.createClient({
 	}
 });
 
-// Use body-parser middleware to parse JSON requests
-app.use(bodyParser.json());
 
 // Define a helper function to handle errors
 const handleError = (err, res) => {
@@ -194,6 +195,23 @@ app.put('/reading-lists/:id/books/:isbn', (req, res) => {
 			}
 
 			res.status(201).send(`Updated Books ${book.isbn}`)
+		})
+		.catch((err) => handleError(err, res));
+});
+
+// Define a route to delete a reading list by id
+app.delete('/reading-lists/:id/books/:bookisbn', (req, res) => {
+	// Get the id from the request params
+	const id = req.params.id;
+	const bookisbn = req.params.bookisbn;
+	client.json.del(rootKeyName, `$.${id}.books.${bookisbn}`)
+		.then((deleteVerdict) => {
+
+			if (!deleteVerdict) {
+				return res.status(404).send('Reading list not found or book not found');
+			}
+
+			res.status(201).send(`deleted ${id}`)
 		})
 		.catch((err) => handleError(err, res));
 });
