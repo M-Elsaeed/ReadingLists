@@ -1,0 +1,82 @@
+.book-info-card{
+	border-width: 2px;
+	border-radius: 20px;
+	padding: 20px 5px 20px 5px!important;
+	margin: 5px;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	justify-content: space-between;
+	width: 20vw;
+	min-height: 70vh;
+	background-color: #f2e9e4;
+	opacity: 95%;
+}
+
+.book-info-card-small{
+	border-width: 2px;
+	border-radius: 20px;
+	padding: 5px 5px 5px 5px!important;
+	margin: 5px;
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+	align-items: center;
+	width: 20vw;
+	min-height: 10vh;
+	max-height: 10vh;
+	background-color: #f2e9e4;
+	opacity: 95%;
+	p {
+		margin: 0px 0px 0px 10px;
+	}
+	img{
+		border-radius: 5px;
+	}
+}
+
+.dropdown{
+	display: flex;
+	flex-direction: row;
+	flex-flow: row;
+	flex-wrap: wrap;
+}
+
+body{
+	background-color: #eae0d5;
+}
+
+img{
+	border-radius: 20px;
+}
+
+input{
+	border-radius: 7px;
+	border-width: 2px;
+	border-style: solid;
+	border-color: cadetblue !important;
+	margin: 5px;
+}
+
+.book-list{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+button{
+	border-width: 2px;
+	border-style: solid;
+	border-color: cadetblue !important;
+	margin: 5px;
+}
+
+@media (max-width: 700px) {
+	.book-info-card{
+		width: 90vw;
+		min-height: 40vh;
+	}
+	.book-info-card-small{
+		width: 90vw;
+	}
+}

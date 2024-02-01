@@ -31,7 +31,7 @@ const BookForm = ({ onAdd, listID }) => {
 
 	return (
 		<div className="book-form">
-			<h2>Add a new book</h2>
+			<h2>Add a new book Manually</h2>
 			<form onSubmit={handleSubmit}>
 				<label htmlFor="isbn">ISBN:</label>
 				<input

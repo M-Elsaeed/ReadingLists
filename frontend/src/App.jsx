@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import BookList from "./Components/BookList.jsx";
 import BookForm from "./Components/BookForm.jsx";
+import SearchBar from "./Components/SearchBar.jsx";
 
 // A custom hook to fetch data from a given URL
 const useFetch = (url) => {
@@ -45,7 +46,7 @@ const App = () => {
 	}, [data]);
 
 	// Handle adding a new book to the selected list
-	const handleAddBook = async (listID, isbn, title, author, status) => {
+	const handleAddBook = async (listID, isbn, title, author, status, image) => {
 		// Check if the isbn already exists in the list
 		console.log(lists)
 		console.log(listID)
@@ -53,12 +54,14 @@ const App = () => {
 			setError("The book with this ISBN already exists in the list.");
 			return;
 		}
+		if(!image) image = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
 		// Create a new book object
 		const newBook = {
 			isbn,
 			title,
 			author,
 			status,
+			image
 		};
 		// Post the new book to the API
 
@@ -94,14 +97,15 @@ const App = () => {
 	};
 
 	// Handle updating a book in the selected list
-	const handleUpdateBook = async (isbn, title, author, status) => {
+	const handleUpdateBook = async (isbn, title, author, status, image) => {
 		// Update the book in the API
 		try {
 			let newBook = {
 				isbn,
 				title,
 				author,
-				status
+				status,
+				image
 			}
 			await axios.put(
 				`http://127.0.0.1:3000/reading-lists/${selectedList}/books/${isbn}`,
@@ -135,6 +139,9 @@ const App = () => {
 								</option>
 							))}
 						</select>
+						{selectedList && <SearchBar listID={selectedList} onAdd={handleAddBook}></SearchBar>}
+						{selectedList && <BookForm listID={selectedList} onAdd={handleAddBook} />}
+						{error && <p className="error">{error}</p>}
 						{lists && selectedList && (
 							<BookList
 								list={lists[selectedList]}
@@ -142,8 +149,6 @@ const App = () => {
 								onUpdate={handleUpdateBook}
 							/>
 						)}
-						{selectedList && <BookForm listID={selectedList} onAdd={handleAddBook} />}
-						{error && <p className="error">{error}</p>}
 					</>
 			}
 		</div>
