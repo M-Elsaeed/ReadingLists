@@ -35,12 +35,12 @@ const handleError = (err, res) => {
 
 // Create Reading List.
 app.post('/reading-lists', (req, res) => {
-	const name = req.body.name
-	if (!name) return res.status(400).send('Name is required')
+	const listName = req.body.listName
+	if (!listName) return res.status(400).send('List Name is required')
 
 	const id = randomUUID()
-	client.json.set(rootKeyName, `$.${id}`, { listName: name, books: {} })
-		.then(() => res.status(201).send({ id, name }))
+	client.json.set(rootKeyName, `$.${id}`, { listName: listName, books: {} })
+		.then(() => res.status(201).send({ id, listName }))
 		.catch((err) => handleError(err, res))
 })
 
@@ -70,14 +70,14 @@ app.get('/reading-lists/:id', (req, res) => {
 // Update Reading List by id
 app.put('/reading-lists/:id', (req, res) => {
 	const id = req.params.id
-	const name = req.body.name
-	if (!name) return res.status(400).send('Name is required')
+	const listName = req.body.listName
+	if (!listName) return res.status(400).send('List Name is required')
 
-	client.json.set(rootKeyName, `$.${id}.listName`, name)
+	client.json.set(rootKeyName, `$.${id}.listName`, listName)
 		.then((updateVerdict) => {
 			if (!updateVerdict) return res.status(404).send('Reading list not found')
 
-			res.status(200).send({ id, name })
+			res.status(200).send({ id, listName })
 		})
 		.catch(err => handleError(err, res))
 })

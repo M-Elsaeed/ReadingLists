@@ -4,7 +4,7 @@ const app = require('./RedisServer')
 
 // Define some sample data for testing
 const sampleReadingList = {
-  name: 'My Reading List',
+  listName: 'My Reading List',
 }
 
 const sampleBook = {
@@ -26,12 +26,12 @@ describe('POST /reading-lists', () => {
       const response = await creatReadingList(sampleReadingList)
       expect(response.statusCode).toBe(201)
       expect(response.body).toHaveProperty('id')
-      expect(response.body.name).toBe(sampleReadingList.name)
+      expect(response.body.listName).toBe(sampleReadingList.listName)
     })
 
   it('should return 400 status code if the name is missing or invalid',
     async () => {
-      const response = await creatReadingList({ name: '' })
+      const response = await creatReadingList({ listName: '' })
       expect(response.statusCode).toBe(400)
     })
 })
@@ -44,7 +44,7 @@ describe('GET /reading-lists', () => {
       // Create some reading lists in the database
       let listNames = ['Reading List 1', 'Reading List 2', 'Reading List 3']
       let responses = []
-      Promise.all(listNames.map(listName => creatReadingList({ name: listName }).then((res) => responses.push(res))))
+      Promise.all(listNames.map(listName => creatReadingList({ listName }).then((res) => responses.push(res))))
       const lists = await request(app).get('/reading-lists')
       expect(responses.length).toBe(3)
       expect(Object.keys(lists).length).toBeGreaterThanOrEqual(3)
@@ -64,7 +64,7 @@ describe('GET /reading-lists/:id', () => {
       expect(response.statusCode).toBe(200)
       // expect(response.body).toHaveProperty('id')
       // expect(response.body.id).toBe(readingList.id)
-      expect(response.body.name).toBe(readingList.name)
+      expect(response.body.listName).toBe(readingList.body.listName)
     })
 
   it('should return 404 status code if the reading list does not exist',
@@ -87,13 +87,13 @@ describe('PUT /reading-lists/:id', () => {
 
       const response = await request(app)
         .put(`/reading-lists/${readingList.body.id}`)
-        .send({ name: newName })
+        .send({ listName: newName })
 
 
       expect(response.statusCode).toBe(200)
       expect(response.body).toHaveProperty('id')
       expect(response.body.id).toBe(readingList.body.id)
-      expect(response.body.name).toBe(newName)
+      expect(response.body.listName).toBe(newName)
     })
 
   it('should return 400 status code if the id or name is missing or invalid',
@@ -101,7 +101,7 @@ describe('PUT /reading-lists/:id', () => {
 
       const response = await request(app)
         .put('/reading-lists/')
-        .send({ name: '' })
+        .send({ listName: '' })
 
       expect(response.statusCode).toBe(404)
 
@@ -113,7 +113,7 @@ describe('PUT /reading-lists/:id', () => {
 
       const response = await request(app)
         .put('/reading-lists/999')
-        .send({ name: 'Nonexistent Reading List' })
+        .send({ listName: 'Nonexistent Reading List' })
 
       expect(response.statusCode).toBe(404)
 
