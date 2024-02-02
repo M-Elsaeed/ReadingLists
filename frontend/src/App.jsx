@@ -3,6 +3,8 @@ import axios from "axios";
 import BookList from "./Components/BookList.jsx";
 import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
+import './Components/styles.css'
+import { DeleteForever, Edit, AddBox, ToggleOn, ToggleOff, ExpandMore, ExpandLess } from '@mui/icons-material';
 
 const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
@@ -39,9 +41,9 @@ const App = () => {
 	const [error, setError] = useState(null);
 	const [newListName, setNewListName] = useState("Your new list name");
 	const [editedListName, setEditedListName] = useState("Your edited list name");
-	const [editedListNameMode, setEditListNameMode] = useState(false);
 	const [listFormOpen, setListFormOpen] = useState(false);
 	const [manualFormOpen, setManualFormOpen] = useState(false);
+	const [newListFormOpen, setNewListFormOpen] = useState(false);
 
 
 	// Fetch the data from the API
@@ -193,20 +195,16 @@ const App = () => {
 			})
 	}
 
-	const handeToggleEditMode = (e) => {
-		e.preventDefault()
-		setEditListNameMode(!editedListNameMode)
-	}
-
 	return (
 		<div className="app">
 			{
 				loading ? <p>Loading</p> :
 					<>
 						<h1>My Reading Lists</h1>
+						<hr />
 						<div>
-							<label>
-								Selected Reading List:
+							<div className="title-with-icon">
+								<h3>Current List:</h3>
 								<select onChange={handleChangeList} value={lists ? selectedListID : undefined}>
 									{lists && Object.keys(lists).map((listKey) => (
 										<option key={listKey} value={listKey}>
@@ -214,47 +212,89 @@ const App = () => {
 										</option>
 									))}
 								</select>
-							</label>
+								{
+									!(newListFormOpen || listFormOpen) &&
+									<div className="title-with-icon">
+										<label className="title-with-icon" onClick={() => { setListFormOpen(true); setNewListFormOpen(false) }}>
+											<Edit fontSize="large" >Create a New Reading List</Edit>
+											Edit List
+										</label>
+										<label className="title-with-icon" onClick={() => { setListFormOpen(false); setNewListFormOpen(true) }}>
+											<AddBox fontSize="large" >Create a New Reading List</AddBox>
+											New List
+										</label>
+									</div>
+								}
+							</div>
+							<div>
+								{listFormOpen && <>
+									<form className="title-with-icon">
+										<label className="title-with-icon">
+											Delete List
+											{selectedListID && <DeleteForever fontSize="large" onClick={handleDeleteList}>Delete Selected Reading List</DeleteForever>}
+										</label>
 
-							{listFormOpen && <>
-
-								{editedListNameMode &&
-									<form>
-										<label>
+										<label className="title-with-icon">
 											Edited List Name:
 											<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
 										</label>
-										<button onClick={handleEditList}>Confirm Edit</button>
+										<label className="title-with-icon">
+											Confirm Edit
+											<Edit fontSize="large" onClick={handleEditList}>Confirm Edit</Edit>
+										</label>
+									</form>
+								</>
+								}
+								{
+									newListFormOpen &&
+									<form>
+										<label>
+											New List Name:
+											<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
+										</label>
+										<label className="title-with-icon" onClick={handleNewList}>
+											<AddBox fontSize="large" >Create a New Reading List</AddBox>
+											Create a New Reading List
+										</label>
 									</form>
 								}
-								{selectedListID && <button onClick={handeToggleEditMode}>Edit Selected Reading List Name</button>}
-								{selectedListID && <button onClick={handleDeleteList}>Delete Selected Reading List</button>}
-								<form>
-									<label>
-										New List Name:
-										<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
+								{
+									(newListFormOpen || listFormOpen) &&
+									< label className="title-with-icon" onClick={() => { setListFormOpen(false); setNewListFormOpen(false); }}>
+										<ExpandLess fontSize="large" ></ExpandLess>
+										Close
 									</label>
-									<button onClick={handleNewList}>Create a New Reading List</button>
-								</form>
-							</>
-
-							}
-							<button onClick={() => { setListFormOpen(!listFormOpen) }}>Toggle Reading Lists Options</button>
+								}
+							</div>
 						</div>
-						{selectedListID && <SearchBar listID={selectedListID} onAdd={handleAddBook}></SearchBar>}
-						<button onClick={() => { setManualFormOpen(!manualFormOpen) }}>Add Book Details Manually</button>
-						{selectedListID && manualFormOpen && <BookForm listID={selectedListID} onAdd={handleAddBook} />}
+
+						<hr />
+
 						{error && <p className="error">{error}</p>}
 						{lists && selectedListID && lists[selectedListID] && (
-							<BookList
-								list={lists[selectedListID]}
-								onDelete={handleDeleteBook}
-								onUpdate={handleUpdateBook}
-							/>
+							<>
+								<h2>{lists[selectedListID].listName}</h2>
+								<div className="title-with-icon">
+									<h4>Add Book Details Manually</h4>
+									{
+										manualFormOpen ?
+											<ExpandLess fontSize="large" onClick={() => { setManualFormOpen(!manualFormOpen) }}></ExpandLess>
+											:
+											<ExpandMore fontSize="large" onClick={() => { setManualFormOpen(!manualFormOpen) }}></ExpandMore>
+									}
+								</div>
+								{manualFormOpen && <BookForm listID={selectedListID} onAdd={handleAddBook} />}
+								<SearchBar listID={selectedListID} onAdd={handleAddBook}></SearchBar>
+								<BookList
+									list={lists[selectedListID]}
+									onDelete={handleDeleteBook}
+									onUpdate={handleUpdateBook}
+								/>
+							</>
 						)}
 					</>
 			}
-		</div>
+		</div >
 	);
 };
 

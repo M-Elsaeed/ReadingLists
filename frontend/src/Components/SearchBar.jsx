@@ -25,8 +25,8 @@ const SearchBar = ({ onAdd, listID }) => {
 	};
 
 	return (
-		<div className="search-bar">
-			<h2>Search Books to Add Automatically</h2>
+		<div className="title-with-icon">
+			<h3>Add Books Automatically by Search: </h3>
 			<input
 				type="text"
 				value={query}

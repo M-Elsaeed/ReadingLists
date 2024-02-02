@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import "./styles.css";
+import { AddBox } from "@mui/icons-material";
 
 // A component to display a form to add a new book
 const BookForm = ({ onAdd, listID }) => {
@@ -33,56 +35,64 @@ const BookForm = ({ onAdd, listID }) => {
 
 	return (
 		<div className="book-form">
-			<h2>Add a new book Manually</h2>
-			<form onSubmit={handleSubmit}>
-				<label htmlFor="isbn">ISBN:</label>
-				<input
-					type="text"
-					id="isbn"
-					name="isbn"
-					value={isbn}
-					onChange={handleChange}
-					required
-				/>
-				<label htmlFor="title">Title:</label>
-				<input
-					type="text"
-					id="title"
-					name="title"
-					value={title}
-					onChange={handleChange}
-					required
-				/>
-				<label htmlFor="author">Author:</label>
-				<input
-					type="text"
-					id="author"
-					name="author"
-					value={author}
-					onChange={handleChange}
-					required
-				/>
-				<label htmlFor="imageURL">Cover URL:</label>
-				<input
-					type="text"
-					id="imageURL"
-					name="imageURL"
-					value={imageURL}
-					onChange={handleChange}
-				/>
-				<label htmlFor="status">Status:</label>
-				<select
-					id="status"
-					name="status"
-					value={status}
-					onChange={handleChange}
-					required
-				>
-					<option value="Unread">Unread</option>
-					<option value="In Progress">In Progress</option>
-					<option value="Finished">Finished</option>
-				</select>
-				<button type="submit">Add</button>
+			{/* <h2>Add a new book Manually</h2> */}
+			<form className="title-with-icon" onSubmit={handleSubmit}>
+				<label htmlFor="isbn">ISBN:
+					<input
+						type="text"
+						id="isbn"
+						name="isbn"
+						value={isbn}
+						onChange={handleChange}
+						required
+					/>
+				</label>
+				<label htmlFor="title">Title:
+					<input
+						type="text"
+						id="title"
+						name="title"
+						value={title}
+						onChange={handleChange}
+						required
+					/>
+				</label>
+				<label htmlFor="author">Author:
+					<input
+						type="text"
+						id="author"
+						name="author"
+						value={author}
+						onChange={handleChange}
+						required
+					/>
+				</label>
+				<label htmlFor="imageURL">Cover URL:
+					<input
+						type="text"
+						id="imageURL"
+						name="imageURL"
+						value={imageURL}
+						onChange={handleChange}
+					/>
+				</label>
+				<label htmlFor="status">Status:
+					<select
+						id="status"
+						name="status"
+						value={status}
+						onChange={handleChange}
+						required
+					>
+						<option value="Unread">Unread</option>
+						<option value="In Progress">In Progress</option>
+						<option value="Finished">Finished</option>
+					</select>
+				</label>
+				<label className="title-with-icon" style={{margin: 0}}>
+					Add Book
+					<AddBox fontSize="large" onClick={handleSubmit} type="submit">Add</AddBox>
+				</label>
 			</form>
 		</div>
 	);
