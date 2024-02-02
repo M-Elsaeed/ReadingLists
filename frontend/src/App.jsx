@@ -4,7 +4,7 @@ import BookList from "./Components/BookList.jsx";
 import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
 
-const ListsAPIEndpoint = import.meta.env.DEV && false ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
+const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
 
 // A custom hook to fetch data from a given URL
@@ -45,8 +45,20 @@ const App = () => {
 
 
 	// Fetch the data from the API
-	const { data, loading } = useFetch(`${ListsAPIEndpoint}/reading-lists`);
+	const { data, loading } = useFetch(`${ListsAPIEndpoint}/reading-lists-info`);
 
+	useEffect(() => {
+		if (selectedListID) {
+			axios.get(`${ListsAPIEndpoint}/reading-lists/${selectedListID}`)
+				.then((res) => {
+					lists[selectedListID] = res.data
+					setLists({ ...lists })
+				})
+				.catch((err) => {
+					setError(err.message)
+				})
+		}
+	}, [selectedListID])
 	// Initialize the lists state with the fetched data
 	useEffect(() => {
 		if (data) {
@@ -58,8 +70,6 @@ const App = () => {
 	// Handle adding a new book to the selected list
 	const handleAddBook = async (listID, isbn, title, author, status, image) => {
 		// Check if the isbn already exists in the list
-		console.log(lists)
-		console.log(listID)
 		if (lists[listID].books[isbn]) {
 			setError("The book with this ISBN already exists in the list.");
 			return;
@@ -232,7 +242,7 @@ const App = () => {
 							<button onClick={() => { setListFormOpen(!listFormOpen) }}>Toggle Reading Lists Options</button>
 						</div>
 						{selectedListID && <SearchBar listID={selectedListID} onAdd={handleAddBook}></SearchBar>}
-						<button onClick={()=>{setManualFormOpen(!manualFormOpen)}}>Add Book Details Manually</button>
+						<button onClick={() => { setManualFormOpen(!manualFormOpen) }}>Add Book Details Manually</button>
 						{selectedListID && manualFormOpen && <BookForm listID={selectedListID} onAdd={handleAddBook} />}
 						{error && <p className="error">{error}</p>}
 						{lists && selectedListID && lists[selectedListID] && (

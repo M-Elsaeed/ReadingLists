@@ -8,7 +8,7 @@ const BookList = ({ list, onDelete, onUpdate }) => {
 		<>
 			<h2>{list.listName}</h2>
 			<div className="book-list">
-				{Object.values(list.books).map((book) => (
+				{list.books ? Object.values(list.books).map((book) => (
 					<Book
 						key={book.isbn}
 						book={book}
@@ -16,7 +16,7 @@ const BookList = ({ list, onDelete, onUpdate }) => {
 						onUpdate={onUpdate}
 						editableCard={true}
 					/>
-				))}
+				)) : <div>No Books Added</div>}
 			</div>
 		</>
 	);
