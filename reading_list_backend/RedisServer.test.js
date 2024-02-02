@@ -15,15 +15,19 @@ const sampleBook = {
   image: "http://covers.openlibrary.org/b/id/10110415-M.jpg"
 }
 
-const creatReadingList = async (listObj) => {
-  return await request(app).post('/reading-lists').send(listObj)
+const createdReadingLists = []
+
+const createReadingList = async (listObj) => {
+  const response = await request(app).post('/reading-lists').send(listObj)
+  createdReadingLists.push(response.body.listID)
+  return response
 }
 
 // Test the POST /reading-lists endpoint
 describe('POST /reading-lists', () => {
   it('should create a new reading list and return 201 status code',
     async () => {
-      const response = await creatReadingList(sampleReadingList)
+      const response = await createReadingList(sampleReadingList)
       expect(response.statusCode).toBe(201)
       expect(response.body).toHaveProperty('listID')
       expect(response.body.listName).toBe(sampleReadingList.listName)
@@ -31,7 +35,7 @@ describe('POST /reading-lists', () => {
 
   it('should return 400 status code if the name is missing or invalid',
     async () => {
-      const response = await creatReadingList({ listName: '' })
+      const response = await createReadingList({ listName: '' })
       expect(response.statusCode).toBe(400)
     })
 })
@@ -44,7 +48,7 @@ describe('GET /reading-lists', () => {
       // Create some reading lists in the database
       let listNames = ['Reading List 1', 'Reading List 2', 'Reading List 3']
       let responses = []
-      Promise.all(listNames.map(listName => creatReadingList({ listName }).then((res) => responses.push(res))))
+      Promise.all(listNames.map(listName => createReadingList({ listName }).then((res) => responses.push(res))))
       const lists = await request(app).get('/reading-lists')
       expect(responses.length).toBe(3)
       expect(Object.keys(lists).length).toBeGreaterThanOrEqual(3)
@@ -58,7 +62,7 @@ describe('GET /reading-lists/:listID', () => {
   it('should return the reading list with the given listID and 200 status code',
     async () => {
       // Create a reading list in the database
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
       // console.log(readingList)
       const response = await request(app).get(`/reading-lists/${readingList.body.listID}`)
       expect(response.statusCode).toBe(200)
@@ -80,7 +84,7 @@ describe('PUT /reading-lists/:listID', () => {
   it('should update the reading list name and return 200 status code',
     async () => {
       // Create a reading list in the database
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
 
       // Update the reading list name
       const newName = 'My Updated Reading List'
@@ -126,7 +130,7 @@ describe('DELETE /reading-lists/:listID', () => {
   it('should delete the reading list with the given listID and return 204 status code',
     async () => {
       // Create a reading list in the database
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
 
 
       const response = await request(app).delete(`/reading-lists/${readingList.body.listID}`)
@@ -157,7 +161,7 @@ describe('POST /reading-lists/:listID/books', () => {
   it('should create a new book in the reading list and return 201 status code',
     async () => {
       // Create a reading list in the database
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
       let response = await request(app)
         .post(`/reading-lists/${readingList.body.listID}/books`)
         .send({ book: sampleBook })
@@ -174,7 +178,7 @@ describe('POST /reading-lists/:listID/books', () => {
   it('should return 400 status code if the book object is missing or invalid',
     async () => {
       // Create a reading list in the database
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
 
 
       const response = await request(app)
@@ -204,7 +208,7 @@ describe('GET /reading-lists/:listID/books/:ISBN', () => {
   it('should return the book with the given ISBN in the reading list and 200 status code',
     async () => {
       // Create a reading list and a book in the database
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
 
       const createdBook = await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
 
@@ -237,7 +241,7 @@ describe('PUT /reading-lists/:listID/books/:ISBN', () => {
       const newStatus = 'Finished'
 
       // Create a reading list and a book in the database
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
       // Update the book status
       await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
       await request(app).put(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`).send({ book: { ...sampleBook, status: newStatus } })
@@ -254,7 +258,7 @@ describe('PUT /reading-lists/:listID/books/:ISBN', () => {
   it("should return 400 status code if the book object is missing or invalid",
     async () => {
       // Create a reading list and a book in the database 
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
       await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
       const response = await request(app).put(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`).send({ book: {} })
       expect(response.statusCode).toBe(400)
@@ -276,7 +280,7 @@ describe("DELETE /reading-lists/:listID/books/:ISBN", () => {
   it("should delete the book with the given ISBN from the reading list and return 204 status code",
     async () => {
       // Create a reading list and a book in the database 
-      const readingList = await creatReadingList(sampleReadingList)
+      const readingList = await createReadingList(sampleReadingList)
       await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
       const response = await request(app).delete(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`)
       expect(response.statusCode).toBe(204)
@@ -286,5 +290,15 @@ describe("DELETE /reading-lists/:listID/books/:ISBN", () => {
     async () => {
       const response = await request(app).delete("/reading-lists/999/books/978-0-123456-47-2")
       expect(response.statusCode).toBe(404)
+    })
+})
+
+// Remove all created lists to avoid cluttering the DB with test data.
+describe("DELETE /reading-lists/:listID/", () => {
+  it("should delete all test-created reading lists",
+    async () => {
+      createdReadingLists.forEach(async (listID) => {
+        await request(app).delete(`/reading-lists/${listID}`);
+      })
     })
 })
