@@ -60,7 +60,6 @@ const getAllLists = (req, res) => {
 app.get('/', getAllLists)
 app.get('/reading-lists', getAllLists)
 app.get('/reading-lists-info', (req, res) => {
-	dummy()
 	client.json.get(readingListsInfoKeyName)
 		.then((result) => res.send(result))
 		.catch((err) => handleError(err, res))
