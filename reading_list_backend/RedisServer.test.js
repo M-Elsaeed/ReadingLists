@@ -48,7 +48,11 @@ describe('GET /reading-lists', () => {
       // Create some reading lists in the database
       let listNames = ['Reading List 1', 'Reading List 2', 'Reading List 3']
       let responses = []
-      Promise.all(listNames.map(listName => createReadingList({ listName }).then((res) => responses.push(res))))
+
+      for (let i = 0; i < listNames.length; i++) {
+        responses.push(await createReadingList({ listName: listNames[i] }))
+      }
+
       const lists = await request(app).get('/reading-lists')
       expect(responses.length).toBe(3)
       expect(Object.keys(lists).length).toBeGreaterThanOrEqual(3)
