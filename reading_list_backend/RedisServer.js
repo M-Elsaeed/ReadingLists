@@ -60,9 +60,9 @@ app.get('/reading-lists/:id', (req, res) => {
 	const id = req.params.id
 	client.json.get(rootKeyName, { path: `$.${id}` })
 		.then((list) => {
-			if (!list) return res.status(404).send('Reading list not found')
+			if (!list || !list[0]) return res.status(404).send('Reading list not found')
 
-			res.status(200).send(list)
+			res.status(200).send(list[0])
 		})
 		.catch((err) => handleError(err, res))
 })
@@ -77,7 +77,7 @@ app.put('/reading-lists/:id', (req, res) => {
 		.then((updateVerdict) => {
 			if (!updateVerdict) return res.status(404).send('Reading list not found')
 
-			res.status(201).send({ id, name })
+			res.status(200).send({ id, name })
 		})
 		.catch(err => handleError(err, res))
 })
@@ -89,7 +89,7 @@ app.delete('/reading-lists/:id', (req, res) => {
 		.then((deleteVerdict) => {
 			if (!deleteVerdict) return res.status(404).send('Reading list not found')
 
-			res.status(201).send(`deleted ${id}`)
+			res.status(204).send(`deleted ${id}`)
 		})
 		.catch((err) => handleError(err, res))
 })
@@ -121,9 +121,9 @@ app.get('/reading-lists/:id/books/:isbn', (req, res) => {
 
 	client.json.get(rootKeyName, { path: `$.${id}.books["${bookisbn}"]` })
 		.then((book) => {
-			if (!book) return res.status(404).send('Reading list or book not found')
+			if (!book || !book[0]) return res.status(404).send('Reading list or book not found')
 
-			res.status(200).send(book)
+			res.status(200).send(book[0])
 		})
 		.catch((err) => handleError(err, res))
 })
@@ -155,10 +155,12 @@ app.delete('/reading-lists/:id/books/:bookisbn', (req, res) => {
 		.then((deleteVerdict) => {
 			if (!deleteVerdict) return res.status(404).send('Reading list not found or book not found')
 
-			res.status(201).send(`deleted ${id}`)
+			res.status(204).send(`deleted ${id}`)
 		})
 		.catch((err) => handleError(err, res))
 })
+
+module.exports = app, client
 
 client.connect()
 	.then(() => {
