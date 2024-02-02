@@ -2,7 +2,7 @@
   "name": "reading_list_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "RedisServer.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test jest --testTimeout=10000"
   },
