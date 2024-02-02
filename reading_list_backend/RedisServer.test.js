@@ -25,7 +25,7 @@ describe('POST /reading-lists', () => {
     async () => {
       const response = await creatReadingList(sampleReadingList)
       expect(response.statusCode).toBe(201)
-      expect(response.body).toHaveProperty('id')
+      expect(response.body).toHaveProperty('listID')
       expect(response.body.listName).toBe(sampleReadingList.listName)
     })
 
@@ -49,21 +49,21 @@ describe('GET /reading-lists', () => {
       expect(responses.length).toBe(3)
       expect(Object.keys(lists).length).toBeGreaterThanOrEqual(3)
       responses.forEach(response => expect(response.statusCode).toBe(201))
-      responses.forEach((response, i) => expect(lists.body[response.body.id]?.listName).toBe(listNames[i]))
+      responses.forEach((response, i) => expect(lists.body[response.body.listID]?.listName).toBe(listNames[i]))
     })
 })
 
-// Test the GET /reading-lists/:id endpoint
-describe('GET /reading-lists/:id', () => {
-  it('should return the reading list with the given id and 200 status code',
+// Test the GET /reading-lists/:listID endpoint
+describe('GET /reading-lists/:listID', () => {
+  it('should return the reading list with the given listID and 200 status code',
     async () => {
       // Create a reading list in the database
       const readingList = await creatReadingList(sampleReadingList)
       // console.log(readingList)
-      const response = await request(app).get(`/reading-lists/${readingList.body.id}`)
+      const response = await request(app).get(`/reading-lists/${readingList.body.listID}`)
       expect(response.statusCode).toBe(200)
-      // expect(response.body).toHaveProperty('id')
-      // expect(response.body.id).toBe(readingList.id)
+      // expect(response.body).toHaveProperty('listID')
+      // expect(response.body.listID).toBe(readingList.listID)
       expect(response.body.listName).toBe(readingList.body.listName)
     })
 
@@ -76,7 +76,7 @@ describe('GET /reading-lists/:id', () => {
 })
 
 // Test the PUT /reading-lists endpoint
-describe('PUT /reading-lists/:id', () => {
+describe('PUT /reading-lists/:listID', () => {
   it('should update the reading list name and return 200 status code',
     async () => {
       // Create a reading list in the database
@@ -86,17 +86,17 @@ describe('PUT /reading-lists/:id', () => {
       const newName = 'My Updated Reading List'
 
       const response = await request(app)
-        .put(`/reading-lists/${readingList.body.id}`)
+        .put(`/reading-lists/${readingList.body.listID}`)
         .send({ listName: newName })
 
 
       expect(response.statusCode).toBe(200)
-      expect(response.body).toHaveProperty('id')
-      expect(response.body.id).toBe(readingList.body.id)
+      expect(response.body).toHaveProperty('listID')
+      expect(response.body.listID).toBe(readingList.body.listID)
       expect(response.body.listName).toBe(newName)
     })
 
-  it('should return 400 status code if the id or name is missing or invalid',
+  it('should return 400 status code if the listID or name is missing or invalid',
     async () => {
 
       const response = await request(app)
@@ -121,19 +121,19 @@ describe('PUT /reading-lists/:id', () => {
     })
 })
 
-// Test the DELETE /reading-lists/:id endpoint
-describe('DELETE /reading-lists/:id', () => {
-  it('should delete the reading list with the given id and return 204 status code',
+// Test the DELETE /reading-lists/:listID endpoint
+describe('DELETE /reading-lists/:listID', () => {
+  it('should delete the reading list with the given listID and return 204 status code',
     async () => {
       // Create a reading list in the database
       const readingList = await creatReadingList(sampleReadingList)
 
 
-      const response = await request(app).delete(`/reading-lists/${readingList.body.id}`)
+      const response = await request(app).delete(`/reading-lists/${readingList.body.listID}`)
 
       expect(response.statusCode).toBe(204)
 
-      const listResponse = await request(app).get(`/reading-lists/${readingList.body.id}`)
+      const listResponse = await request(app).get(`/reading-lists/${readingList.body.listID}`)
 
       expect(listResponse.statusCode).toBe(404)
 
@@ -152,18 +152,18 @@ describe('DELETE /reading-lists/:id', () => {
     })
 })
 
-// Test the POST /reading-lists/:id/books endpoint
-describe('POST /reading-lists/:id/books', () => {
+// Test the POST /reading-lists/:listID/books endpoint
+describe('POST /reading-lists/:listID/books', () => {
   it('should create a new book in the reading list and return 201 status code',
     async () => {
       // Create a reading list in the database
       const readingList = await creatReadingList(sampleReadingList)
       let response = await request(app)
-        .post(`/reading-lists/${readingList.body.id}/books`)
+        .post(`/reading-lists/${readingList.body.listID}/books`)
         .send({ book: sampleBook })
 
       expect(response.statusCode).toBe(201)
-      const listResponse = await request(app).get(`/reading-lists/${readingList.body.id}`)
+      const listResponse = await request(app).get(`/reading-lists/${readingList.body.listID}`)
       expect(listResponse.body.books[sampleBook.isbn].isbn).toBe(sampleBook.isbn)
       expect(listResponse.body.books[sampleBook.isbn].title).toBe(sampleBook.title)
       expect(listResponse.body.books[sampleBook.isbn].author).toBe(sampleBook.author)
@@ -178,7 +178,7 @@ describe('POST /reading-lists/:id/books', () => {
 
 
       const response = await request(app)
-        .post(`/reading-lists/${readingList.id}/books`)
+        .post(`/reading-lists/${readingList.listID}/books`)
         .send({ book: {} })
 
       expect(response.statusCode).toBe(400)
@@ -199,16 +199,16 @@ describe('POST /reading-lists/:id/books', () => {
     })
 })
 
-// Test the GET /reading-lists/:id/books/:ISBN endpoint
-describe('GET /reading-lists/:id/books/:ISBN', () => {
+// Test the GET /reading-lists/:listID/books/:ISBN endpoint
+describe('GET /reading-lists/:listID/books/:ISBN', () => {
   it('should return the book with the given ISBN in the reading list and 200 status code',
     async () => {
       // Create a reading list and a book in the database
       const readingList = await creatReadingList(sampleReadingList)
 
-      const createdBook = await request(app).post(`/reading-lists/${readingList.body.id}/books`).send({ book: sampleBook })
+      const createdBook = await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
 
-      const response = await request(app).get(`/reading-lists/${readingList.body.id}/books/${sampleBook.isbn}`)
+      const response = await request(app).get(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`)
       expect(response.statusCode).toBe(200)
       expect(response.body.isbn).toBe(sampleBook.isbn)
       expect(response.body.title).toBe(sampleBook.title)
@@ -230,8 +230,8 @@ describe('GET /reading-lists/:id/books/:ISBN', () => {
     })
 })
 
-// Test the PUT /reading-lists/:id/books/:ISBN endpoint
-describe('PUT /reading-lists/:id/books/:ISBN', () => {
+// Test the PUT /reading-lists/:listID/books/:ISBN endpoint
+describe('PUT /reading-lists/:listID/books/:ISBN', () => {
   it('should update the book with the given ISBN in the reading list and return 200 status code',
     async () => {
       const newStatus = 'Finished'
@@ -239,9 +239,9 @@ describe('PUT /reading-lists/:id/books/:ISBN', () => {
       // Create a reading list and a book in the database
       const readingList = await creatReadingList(sampleReadingList)
       // Update the book status
-      await request(app).post(`/reading-lists/${readingList.body.id}/books`).send({ book: sampleBook })
-      await request(app).put(`/reading-lists/${readingList.body.id}/books/${sampleBook.isbn}`).send({ book: { ...sampleBook, status: newStatus } })
-      getBookResponse = await request(app).get(`/reading-lists/${readingList.body.id}/books/${sampleBook.isbn}`)
+      await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
+      await request(app).put(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`).send({ book: { ...sampleBook, status: newStatus } })
+      getBookResponse = await request(app).get(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`)
 
       expect(getBookResponse.statusCode).toBe(200)
       expect(getBookResponse.body.isbn).toBe(sampleBook.isbn)
@@ -255,8 +255,8 @@ describe('PUT /reading-lists/:id/books/:ISBN', () => {
     async () => {
       // Create a reading list and a book in the database 
       const readingList = await creatReadingList(sampleReadingList)
-      await request(app).post(`/reading-lists/${readingList.body.id}/books`).send({ book: sampleBook })
-      const response = await request(app).put(`/reading-lists/${readingList.body.id}/books/${sampleBook.isbn}`).send({ book: {} })
+      await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
+      const response = await request(app).put(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`).send({ book: {} })
       expect(response.statusCode).toBe(400)
 
       // expect(response.body).toHaveProperty('error')
@@ -271,14 +271,14 @@ describe('PUT /reading-lists/:id/books/:ISBN', () => {
     })
 })
 
-// Test the DELETE /reading-lists/:id/books/:ISBN endpoint 
-describe("DELETE /reading-lists/:id/books/:ISBN", () => {
+// Test the DELETE /reading-lists/:listID/books/:ISBN endpoint 
+describe("DELETE /reading-lists/:listID/books/:ISBN", () => {
   it("should delete the book with the given ISBN from the reading list and return 204 status code",
     async () => {
       // Create a reading list and a book in the database 
       const readingList = await creatReadingList(sampleReadingList)
-      await request(app).post(`/reading-lists/${readingList.body.id}/books`).send({ book: sampleBook })
-      const response = await request(app).delete(`/reading-lists/${readingList.body.id}/books/${sampleBook.isbn}`)
+      await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
+      const response = await request(app).delete(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`)
       expect(response.statusCode).toBe(204)
     })
 

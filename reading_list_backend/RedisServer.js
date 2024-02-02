@@ -38,9 +38,9 @@ app.post('/reading-lists', (req, res) => {
 	const listName = req.body.listName
 	if (!listName) return res.status(400).send('List Name is required')
 
-	const id = randomUUID()
-	client.json.set(rootKeyName, `$.${id}`, { listName: listName, books: {} })
-		.then(() => res.status(201).send({ id, listName }))
+	const listID = randomUUID()
+	client.json.set(rootKeyName, `$.${listID}`, { listName: listName, books: {} })
+		.then(() => res.status(201).send({ listID, listName }))
 		.catch((err) => handleError(err, res))
 })
 
@@ -56,9 +56,9 @@ app.get('/reading-lists', getAllLists)
 
 
 // Read Reading List by id
-app.get('/reading-lists/:id', (req, res) => {
-	const id = req.params.id
-	client.json.get(rootKeyName, { path: `$.${id}` })
+app.get('/reading-lists/:listID', (req, res) => {
+	const listID = req.params.listID
+	client.json.get(rootKeyName, { path: `$.${listID}` })
 		.then((list) => {
 			if (!list || !list[0]) return res.status(404).send('Reading list not found')
 
@@ -68,34 +68,34 @@ app.get('/reading-lists/:id', (req, res) => {
 })
 
 // Update Reading List by id
-app.put('/reading-lists/:id', (req, res) => {
-	const id = req.params.id
+app.put('/reading-lists/:listID', (req, res) => {
+	const listID = req.params.listID
 	const listName = req.body.listName
 	if (!listName) return res.status(400).send('List Name is required')
 
-	client.json.set(rootKeyName, `$.${id}.listName`, listName)
+	client.json.set(rootKeyName, `$.${listID}.listName`, listName)
 		.then((updateVerdict) => {
 			if (!updateVerdict) return res.status(404).send('Reading list not found')
 
-			res.status(200).send({ id, listName })
+			res.status(200).send({ listID, listName })
 		})
 		.catch(err => handleError(err, res))
 })
 
 // Delete Reading List by id
-app.delete('/reading-lists/:id', (req, res) => {
-	const id = req.params.id
-	client.json.del(rootKeyName, `$.${id}`)
+app.delete('/reading-lists/:listID', (req, res) => {
+	const listID = req.params.listID
+	client.json.del(rootKeyName, `$.${listID}`)
 		.then((deleteVerdict) => {
 			if (!deleteVerdict) return res.status(404).send('Reading list not found')
 
-			res.status(204).send(`deleted ${id}`)
+			res.status(204).send(`deleted ${listID}`)
 		})
 		.catch((err) => handleError(err, res))
 })
 
 // Create Book in reading list.
-app.post('/reading-lists/:id/books', (req, res) => {
+app.post('/reading-lists/:listID/books', (req, res) => {
 
 	const book = req.body.book
 	if (!book) return res.status(400).send('Book is required')
@@ -104,22 +104,22 @@ app.post('/reading-lists/:id/books', (req, res) => {
 
 
 	// only set if not exists
-	const id = req.params.id
-	client.json.set(rootKeyName, `$.${id}.books["${cleanBookISBN(book.isbn)}"]`, book, { NX: true })
+	const listID = req.params.listID
+	client.json.set(rootKeyName, `$.${listID}.books["${cleanBookISBN(book.isbn)}"]`, book, { NX: true })
 		.then((addVerdict) => {
 			if (!addVerdict) return res.status(404).send('Failed to add, book already exists or reading list does not exist.')
 
-			res.status(201).send(`Added Book ${book.title} with ISBN: ${book.isbn} to list ${id}`)
+			res.status(201).send(`Added Book ${book.title} with ISBN: ${book.isbn} to list ${listID}`)
 		})
 		.catch((err) => handleError(err, res))
 })
 
 // Read Book in reading list by ISBN
-app.get('/reading-lists/:id/books/:isbn', (req, res) => {
-	const id = req.params.id
+app.get('/reading-lists/:listID/books/:isbn', (req, res) => {
+	const listID = req.params.listID
 	const bookisbn = cleanBookISBN(req.params.isbn)
 
-	client.json.get(rootKeyName, { path: `$.${id}.books["${bookisbn}"]` })
+	client.json.get(rootKeyName, { path: `$.${listID}.books["${bookisbn}"]` })
 		.then((book) => {
 			if (!book || !book[0]) return res.status(404).send('Reading list or book not found')
 
@@ -129,15 +129,15 @@ app.get('/reading-lists/:id/books/:isbn', (req, res) => {
 })
 
 // update book by ISBN
-app.put('/reading-lists/:id/books/:isbn', (req, res) => {
-	const id = req.params.id
+app.put('/reading-lists/:listID/books/:isbn', (req, res) => {
+	const listID = req.params.listID
 	const book = req.body.book
 	if (!book) return res.status(400).send('Book is required')
 	if (!validateBook(book)) return res.status(400).send('Book is invalid')
 	const bookisbn = cleanBookISBN(req.params.isbn)
 	book.isbn = bookisbn
 
-	client.json.set(rootKeyName, `$.${id}.books["${bookisbn}"]`, book, { XX: true })
+	client.json.set(rootKeyName, `$.${listID}.books["${bookisbn}"]`, book, { XX: true })
 		.then((updateVerdict) => {
 			if (!updateVerdict) return res.status(404).send('Failed to modify book, check book isbn or reading list does not exist.')
 
@@ -147,15 +147,15 @@ app.put('/reading-lists/:id/books/:isbn', (req, res) => {
 })
 
 // delete book by ISBN
-app.delete('/reading-lists/:id/books/:bookisbn', (req, res) => {
-	const id = req.params.id
+app.delete('/reading-lists/:listID/books/:bookisbn', (req, res) => {
+	const listID = req.params.listID
 	const bookisbn = cleanBookISBN(req.params.bookisbn)
 
-	client.json.del(rootKeyName, `$.${id}.books["${bookisbn}"]`)
+	client.json.del(rootKeyName, `$.${listID}.books["${bookisbn}"]`)
 		.then((deleteVerdict) => {
 			if (!deleteVerdict) return res.status(404).send('Reading list not found or book not found')
 
-			res.status(204).send(`deleted ${id}`)
+			res.status(204).send(`deleted ${listID}`)
 		})
 		.catch((err) => handleError(err, res))
 })
