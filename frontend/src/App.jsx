@@ -4,7 +4,7 @@ import BookList from "./Components/BookList.jsx";
 import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
 
-const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
+const ListsAPIEndpoint = import.meta.env.DEV && false ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
 
 // A custom hook to fetch data from a given URL
@@ -13,18 +13,19 @@ const useFetch = (url) => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
+	const fetchData = async () => {
+		try {
+			const response = await axios.get(url);
+			setData(response.data);
+			setLoading(false);
+		} catch (err) {
+			setError(err.message);
+			setLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(url);
-				setData(response.data);
-				setLoading(false);
-			} catch (err) {
-				setError(err.message);
-				setLoading(false);
-			}
-		};
-		fetchData();``
+		fetchData();
 	}, [url]);
 
 	return { data, loading, error };
@@ -34,11 +35,13 @@ const useFetch = (url) => {
 // A component to display the CRUD app
 const App = () => {
 	const [lists, setLists] = useState(null);
-	const [selectedList, setSelectedList] = useState(null);
+	const [selectedListID, setSelectedListID] = useState(null);
 	const [error, setError] = useState(null);
 	const [newListName, setNewListName] = useState("Your new list name");
 	const [editedListName, setEditedListName] = useState("Your edited list name");
 	const [editedListNameMode, setEditListNameMode] = useState(false);
+	const [listFormOpen, setListFormOpen] = useState(false);
+	const [manualFormOpen, setManualFormOpen] = useState(false);
 
 
 	// Fetch the data from the API
@@ -48,7 +51,7 @@ const App = () => {
 	useEffect(() => {
 		if (data) {
 			setLists(data);
-			setSelectedList(Object.keys(data)[0]);
+			setSelectedListID(Object.keys(data)[0]);
 		}
 	}, [data]);
 
@@ -93,10 +96,10 @@ const App = () => {
 		// Delete the book from the API
 		try {
 			await axios.delete(
-				`${ListsAPIEndpoint}/reading-lists/${selectedList}/books/${isbn}`
+				`${ListsAPIEndpoint}/reading-lists/${selectedListID}/books/${isbn}`
 			);
 			// Update the lists state by removing the deleted book
-			delete lists[selectedList].books[isbn];
+			delete lists[selectedListID].books[isbn];
 			setLists({ ...lists });
 		} catch (err) {
 			setError(err.message);
@@ -115,12 +118,13 @@ const App = () => {
 				image
 			}
 			await axios.put(
-				`${ListsAPIEndpoint}/reading-lists/${selectedList}/books/${isbn}`,
+				`${ListsAPIEndpoint}/reading-lists/${selectedListID}/books/${isbn}`,
 				{
 					book: newBook
 				}
 			);
-			lists[selectedList].books[isbn] = newBook;
+
+			lists[selectedListID].books[isbn] = newBook;
 			setLists({ ...lists });
 		} catch (err) {
 			setError(err.message);
@@ -131,16 +135,18 @@ const App = () => {
 	const handleChangeList = (e) => {
 		e.preventDefault();
 		const listId = e.target.value;
-		setSelectedList(listId);
+		setSelectedListID(listId);
 	};
 
 	// Handle changing the selected list
 	const handleDeleteList = (e) => {
 		e.preventDefault();
 		if (confirm("Are you sure you want to delete this list?")) {
-			axios.delete(`${ListsAPIEndpoint}/reading-lists/${selectedList}`)
+			axios.delete(`${ListsAPIEndpoint}/reading-lists/${selectedListID}`)
 				.then((res) => {
-					setSelectedList(null)
+					delete lists[selectedListID]
+					setLists({ ...lists })
+					setSelectedListID(Object.keys(lists)[0])
 					setError(null)
 				})
 				.catch((err) => {
@@ -151,9 +157,11 @@ const App = () => {
 
 	const handleNewList = (e) => {
 		e.preventDefault();
-		axios.post(`${ListsAPIEndpoint}/reading-lists/`, { name: newListName })
+		axios.post(`${ListsAPIEndpoint}/reading-lists/`, { listName: newListName })
 			.then((res) => {
-				setSelectedList(res.data.id)
+				lists[res.data.listID] = { listName: res.data.listName, books: {} }
+				setLists({ ...lists })
+				setSelectedListID(res.data.listID)
 				setError(null)
 			})
 			.catch((err) => {
@@ -163,9 +171,11 @@ const App = () => {
 
 	const handleEditList = (e) => {
 		e.preventDefault();
-		axios.put(`${ListsAPIEndpoint}/reading-lists/${selectedList}`, { name: editedListName })
+		axios.put(`${ListsAPIEndpoint}/reading-lists/${selectedListID}`, { listName: editedListName })
 			.then((res) => {
-				setSelectedList(res.data.id)
+				lists[selectedListID].listName = editedListName
+				setLists({ ...lists })
+				setSelectedListID(res.data.listID)
 				setError(null)
 			})
 			.catch((err) => {
@@ -187,7 +197,7 @@ const App = () => {
 						<div>
 							<label>
 								Selected Reading List:
-								<select onChange={handleChangeList}>
+								<select onChange={handleChangeList} value={lists ? selectedListID : undefined}>
 									{lists && Object.keys(lists).map((listKey) => (
 										<option key={listKey} value={listKey}>
 											{lists[listKey].listName}
@@ -195,31 +205,39 @@ const App = () => {
 									))}
 								</select>
 							</label>
-							{editedListNameMode &&
+
+							{listFormOpen && <>
+
+								{editedListNameMode &&
+									<form>
+										<label>
+											Edited List Name:
+											<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
+										</label>
+										<button onClick={handleEditList}>Confirm Edit</button>
+									</form>
+								}
+								{selectedListID && <button onClick={handeToggleEditMode}>Edit Selected Reading List Name</button>}
+								{selectedListID && <button onClick={handleDeleteList}>Delete Selected Reading List</button>}
 								<form>
 									<label>
-										Edited List Name:
-										<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
+										New List Name:
+										<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
 									</label>
-									<button onClick={handleEditList}>Confirm Edit</button>
+									<button onClick={handleNewList}>Create a New Reading List</button>
 								</form>
+							</>
+
 							}
-							{selectedList && <button onClick={handeToggleEditMode}>Edit Selected Reading List Name</button>}
-							{selectedList && <button onClick={handleDeleteList}>Delete Selected Reading List</button>}
-							<form>
-								<label>
-									New List Name:
-									<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
-								</label>
-								<button onClick={handleNewList}>Create a New Reading List</button>
-							</form>
+							<button onClick={() => { setListFormOpen(!listFormOpen) }}>Toggle Reading Lists Options</button>
 						</div>
-						{selectedList && <SearchBar listID={selectedList} onAdd={handleAddBook}></SearchBar>}
-						{selectedList && <BookForm listID={selectedList} onAdd={handleAddBook} />}
+						{selectedListID && <SearchBar listID={selectedListID} onAdd={handleAddBook}></SearchBar>}
+						<button onClick={()=>{setManualFormOpen(!manualFormOpen)}}>Add Book Details Manually</button>
+						{selectedListID && manualFormOpen && <BookForm listID={selectedListID} onAdd={handleAddBook} />}
 						{error && <p className="error">{error}</p>}
-						{lists && selectedList && lists[selectedList] && (
+						{lists && selectedListID && lists[selectedListID] && (
 							<BookList
-								list={lists[selectedList]}
+								list={lists[selectedListID]}
 								onDelete={handleDeleteBook}
 								onUpdate={handleUpdateBook}
 							/>
