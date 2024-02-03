@@ -3,9 +3,11 @@ import axios from "axios";
 import BookList from "./Components/BookList.jsx";
 import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
-import { DeleteForever, Edit, AddBox, ToggleOn, ToggleOff, ExpandMore, ExpandLess } from '@mui/icons-material';
+import ListForm from "./Components/ListForm.jsx";
+import ListSelector from "./Components/ListSelector.jsx";
+import { ExpandMore, ExpandLess } from '@mui/icons-material';
 
-const ListsAPIEndpoint = import.meta.env.DEV  ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
+const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
 
 // A custom hook to fetch data from a given URL
@@ -38,19 +40,13 @@ const App = () => {
 	const [lists, setLists] = useState(null);
 	const [selectedListID, setSelectedListID] = useState(null);
 	const [error, setError] = useState(null);
-	const [newListName, setNewListName] = useState("Your new list name");
-	const [editedListName, setEditedListName] = useState("Your edited list name");
-	const [listFormOpen, setListFormOpen] = useState(false);
 	const [manualFormOpen, setManualFormOpen] = useState(false);
-	const [newListFormOpen, setNewListFormOpen] = useState(false);
-
 
 	// Fetch the data from the API
 	const { data, loading } = useFetch(`${ListsAPIEndpoint}/reading-lists-info`);
 
 	useEffect(() => {
 		if (selectedListID) {
-			setEditedListName(lists[selectedListID].listName)
 			axios.get(`${ListsAPIEndpoint}/reading-lists/${selectedListID}`)
 				.then((res) => {
 					lists[selectedListID] = res.data
@@ -150,7 +146,7 @@ const App = () => {
 		setSelectedListID(listId);
 	};
 
-	// Handle changing the selected list
+	// Handle deleting the selected list
 	const handleDeleteList = (e) => {
 		e.preventDefault();
 		if (confirm("Are you sure you want to delete this list?")) {
@@ -160,7 +156,6 @@ const App = () => {
 					setLists({ ...lists })
 					setSelectedListID(Object.keys(lists)[0])
 					setError(null)
-					setListFormOpen(false)
 				})
 				.catch((err) => {
 					setError(err.message)
@@ -168,30 +163,32 @@ const App = () => {
 		}
 	};
 
+	// Handle creating a new list
 	const handleNewList = (e) => {
 		e.preventDefault();
+		const newListName = e.target.newListName.value;
 		axios.post(`${ListsAPIEndpoint}/reading-lists/`, { listName: newListName })
 			.then((res) => {
 				lists[res.data.listID] = { listName: res.data.listName, books: {} }
 				setLists({ ...lists })
 				setSelectedListID(res.data.listID)
 				setError(null)
-				setNewListFormOpen(false)
 			})
 			.catch((err) => {
 				setError(err.message)
 			})
 	}
 
+	// Handle editing the selected list
 	const handleEditList = (e) => {
 		e.preventDefault();
+		const editedListName = e.target.editedListName.value;
 		axios.put(`${ListsAPIEndpoint}/reading-lists/${selectedListID}`, { listName: editedListName })
 			.then((res) => {
 				lists[selectedListID].listName = editedListName
 				setLists({ ...lists })
 				setSelectedListID(res.data.listID)
 				setError(null)
-				setListFormOpen(false)
 			})
 			.catch((err) => {
 				setError(err.message)
@@ -208,68 +205,8 @@ const App = () => {
 						<div>
 							<div className="title-with-icon">
 								<h3>Current List:</h3>
-								<select onChange={handleChangeList} value={lists ? selectedListID : undefined}>
-									{lists && Object.keys(lists).map((listKey) => (
-										<option key={listKey} value={listKey}>
-											{lists[listKey].listName}
-										</option>
-									))}
-								</select>
-								{
-									!(newListFormOpen || listFormOpen) &&
-									<div className="title-with-icon">
-										<label className="title-with-icon button edit-color" onClick={() => { setListFormOpen(true); setNewListFormOpen(false) }}>
-											<Edit fontSize="medium" ></Edit>
-											Edit List
-										</label>
-										<label className="title-with-icon button add-color" onClick={() => { setListFormOpen(false); setNewListFormOpen(true) }}>
-											<AddBox fontSize="medium" ></AddBox>
-											New List
-										</label>
-									</div>
-								}
-							</div>
-							<div>
-								{listFormOpen && <>
-									<form className="title-with-icon">
-										<div className="title-with-icon">
-
-											<label className="title-with-icon">
-												Edited List Name:
-												<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
-											</label>
-											<label className="title-with-icon button edit-color" onClick={handleEditList}>
-												<Edit fontSize="medium" ></Edit>
-												Confirm Edit
-											</label>
-										</div>
-										<label className="title-with-icon button delete-color" onClick={handleDeleteList} style={{ marginTop: "10px", marginBottom: "10px" }}>
-											{selectedListID && <DeleteForever fontSize="medium" >Delete Selected Reading List</DeleteForever>}
-											Delete List
-										</label>
-									</form>
-								</>
-								}
-								{
-									newListFormOpen &&
-									<form className="title-with-icon">
-										<label className="title-with-icon">
-											New List Name:
-											<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
-										</label>
-										<label className="title-with-icon button add-color" onClick={handleNewList}>
-											<AddBox fontSize="medium" ></AddBox>
-											Create a New Reading List
-										</label>
-									</form>
-								}
-								{
-									(newListFormOpen || listFormOpen) &&
-									< label className="title-with-icon" onClick={() => { setListFormOpen(false); setNewListFormOpen(false); }}>
-										<ExpandLess fontSize="medium" ></ExpandLess>
-										Close
-									</label>
-								}
+								<ListSelector lists={lists} selectedListID={selectedListID} onChange={handleChangeList} />
+								<ListForm lists={lists} selectedListID={selectedListID} onNew={handleNewList} onEdit={handleEditList} onDelete={handleDeleteList} />
 							</div>
 						</div>
 

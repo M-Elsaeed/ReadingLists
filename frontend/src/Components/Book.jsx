@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Edit, DeleteForever, Clear, Save } from "@mui/icons-material";
 
 // A component to display a single book
@@ -60,7 +60,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 						</div>
 					</>
 					<form>
-						<div className="title-with-icon">
+						<div>
 							<label><b>Title: </b>
 								<input
 									type="text"
@@ -70,7 +70,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 								/>
 							</label>
 						</div>
-						<div className="title-with-icon">
+						<div>
 							<label><b>Author: </b></label>
 							<input
 								type="text"
@@ -79,7 +79,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 								onChange={handleChange}
 							/>
 						</div>
-						<div className="title-with-icon">
+						<div>
 							<label><b>Status: </b></label>
 							<select name="status" value={newStatus} onChange={handleChange}>
 								<option value="Unread">Unread</option>

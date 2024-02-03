@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import Book from './Book.jsx';
 
 // A component to display a list of books
