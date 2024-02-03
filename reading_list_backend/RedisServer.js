@@ -59,6 +59,8 @@ const getAllLists = (req, res) => {
 
 app.get('/', getAllLists)
 app.get('/reading-lists', getAllLists)
+
+// Get Only Reading Lists Info (listID, listName)
 app.get('/reading-lists-info', (req, res) => {
 	client.json.get(readingListsInfoKeyName)
 		.then((result) => res.send(result))
