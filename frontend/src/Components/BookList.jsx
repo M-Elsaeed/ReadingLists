@@ -4,7 +4,7 @@ import Book from './Book.jsx';
 const BookList = ({ list, onDelete, onUpdate }) => {
 	return (
 		<div className="book-list">
-			{list.books && Object.values(list.books).length ? Object.values(list.books).map((book) => (
+			{list.books && Object.values(list.books).length ? Object.values(list.books).reverse().map((book) => (
 				<Book
 					key={book.isbn}
 					book={book}

@@ -46,7 +46,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 						<img height="200vh" width="150vw" src={book.image ? book.image : "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}></img>
 					</div>
 					<>
-						<div style={{ width: "100%" }}>
+						<div >
 							<hr />
 						</div>
 						<div className="space-between-flex">
@@ -56,7 +56,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 								<Clear fontSize="medium"></Clear>Cancel
 							</label>
 						</div>
-						<div style={{ width: "100%" }}>
+						<div >
 							<hr />
 						</div>
 					</>
@@ -98,7 +98,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 
 					{editableCard &&
 						<>
-							<div style={{ width: "100%" }}>
+							<div >
 								<hr />
 							</div>
 							<div className="space-between-flex">
@@ -112,7 +112,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 									Delete
 								</label>
 							</div>
-							<div style={{ width: "100%" }}>
+							<div >
 								<hr />
 							</div>
 						</>

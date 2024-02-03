@@ -1,8 +1,8 @@
 * {
 	box-sizing: border-box !important;
-  }
-  
-  :root {
+}
+
+:root {
 	padding: 1rem;
 	margin: 0 auto;
 	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -16,59 +16,58 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	width: 100%;
-  }
-  
-  a {
+}
+
+a {
 	font-weight: 500;
 	color: #646cff;
 	text-decoration: inherit;
-  }
-  
-  a:hover {
+}
+
+a:hover {
 	color: #535bf2;
-  }
-  
-  select,
-  input {
+}
+
+select,
+input {
 	padding: 5px;
 	margin: 5px;
-	border: 1px transparent black;
 	border-radius: 5px;
-  }
-  
-  body {
+}
+
+body {
 	margin: 0 auto;
 	place-items: center;
 	min-width: 320px;
 	min-height: 100vh;
 	padding: 10px;
 	width: 100%;
-  }
-  
-  h1 {
+}
+
+h1 {
 	font-size: 3.2em;
 	line-height: 1.1;
-  }
-  
-  button:hover {
+}
+
+button:hover {
 	border-color: #646cff;
-  }
-  
-  button:focus,
-  button:focus-visible {
+}
+
+button:focus,
+button:focus-visible {
 	outline: 4px auto -webkit-focus-ring-color;
-  }
-  
-  .space-between-flex {
+}
+
+.space-between-flex {
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: space-around;
 	align-items: center;
 	margin-bottom: 3px;
 	width: 100%;
-  }
-  
-  .book-info-card {
+}
+
+.book-info-card {
 	border-radius: 20px;
 	padding: 20px 5px !important;
 	margin: 5px;
@@ -80,9 +79,9 @@
 	width: 20vw;
 	min-height: 70vh;
 	background-color: transparent;
-  }
-  
-  .book-info-card-small {
+}
+
+.book-info-card-small {
 	border-radius: 20px;
 	padding: 5px !important;
 	margin: 5px;
@@ -97,114 +96,119 @@
 	border: 0.1px solid black;
 	overflow: hidden;
 	overflow-y: visible;
-  }
-  
-  .book-info-card-small p {
+}
+
+.book-info-card-small p {
 	margin: 0 0 0 10px;
-  }
-  
-  .book-info-card-small img {
+}
+
+.book-info-card-small img {
 	border-radius: 5px;
-  }
-  
-  .book-form {
+}
+
+.book-form {
 	width: 15vw;
-  }
-  
-  .book-form label {
+}
+
+.book-form label {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-  }
-  
-  .book-form input,
-  .book-form select {
+}
+
+.book-form input,
+.book-form select {
 	width: 70%;
-  }
-  
-  .title-with-icon {
+}
+
+.title-with-icon {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-  }
-  
-  button.title-with-icon,
-  label.title-with-icon.button {
-	margin: 0 5px;
+}
+
+.title-with-icon-nowrap {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	flex-wrap: nowrap;
+}
+
+
+button.title-with-icon,
+label.title-with-icon.button,
+label.title-with-icon {
 	border-radius: 10px;
-	padding: 0 5px;
 	width: fit-content;
-  }
-  
-  label.title-with-icon {
-	margin: 0 5px;
-	border-style: none;
-	border-radius: 10px;
-  }
-  
-  .add-color {
+	padding: 5px 0px;
+}
+
+.add-color {
 	color: #2ecc71;
-  }
-  
-  .delete-color {
+}
+
+.delete-color {
 	color: #e74c3c;
-  }
-  
-  .edit-color {
+}
+
+.edit-color {
 	color: #f39c12;
-  }
-  
-  .dropdown {
+}
+
+.dropdown {
 	display: flex;
 	flex-direction: row;
 	flex-flow: row;
 	flex-wrap: wrap;
-  }
-  
-  img {
+}
+
+img {
 	border-radius: 20px;
-  }
-  
-  .book-list {
+}
+
+.book-list {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
 	text-align: center;
 	margin-top: 5vh;
-  }
-  
-  @media (max-width: 700px) {
+}
+
+@media (max-width: 700px) {
+	.title-with-icon-nowrap {
+		flex-wrap: wrap;
+	}
+
 	.book-info-card {
-	  width: 90vw;
-	  min-height: 40vh;
+		width: 90vw;
+		min-height: 40vh;
 	}
-  
+
 	.book-info-card-small {
-	  width: 90vw;
+		width: 90vw;
 	}
-  
+
 	.book-form {
-	  width: 95vw;
+		width: 90vw;
 	}
-  
+
 	form.title-with-icon {
-	  flex-direction: column;
-	  align-items: start;
+		flex-direction: column;
+		align-items: start;
 	}
-  }
-  
-  @media (prefers-color-scheme: light) {
+}
+
+@media (prefers-color-scheme: light) {
 	:root {
-	  color: #213547;
-	  background-color: #ffffff;
+		color: #213547;
+		background-color: #ffffff;
 	}
-  
+
 	a:hover {
-	  color: #747bff;
+		color: #747bff;
 	}
-  
+
 	button {
-	  background-color: #f9f9f9;
+		background-color: #f9f9f9;
 	}
-  }
-  
+}

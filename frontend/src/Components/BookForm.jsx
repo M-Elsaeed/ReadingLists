@@ -96,9 +96,9 @@ const BookForm = ({ onAdd, listID }) => {
 				</label>
 				<br></br>
 
-				<label onClick={handleSubmit} className="title-with-icon button add-color" style={{ margin: 0 }}>
-					Add Book
+				<label onClick={handleSubmit} className="title-with-icon button add-color">
 					<AddBox fontSize="medium" type="submit">Add</AddBox>
+					Add Book
 				</label>
 			</form>
 		</div>

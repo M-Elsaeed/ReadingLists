@@ -38,7 +38,7 @@ const App = () => {
 	const [lists, setLists] = useState(null);
 	const [selectedListID, setSelectedListID] = useState(null);
 	const [error, setError] = useState(null);
-	const [newListName, setNewListName] = useState("Your new list name");
+	const [newListName, setNewListName] = useState("");
 	const [editedListName, setEditedListName] = useState("Your edited list name");
 	const [listFormOpen, setListFormOpen] = useState(false);
 	const [manualFormOpen, setManualFormOpen] = useState(false);
@@ -206,9 +206,10 @@ const App = () => {
 						<h1>My Reading Lists</h1>
 						<hr />
 						<div>
-							<div className="title-with-icon">
-								{/* List Selector */}
-								<h3>Current List:</h3>
+							{/* List Selector */}
+							<div className="title-with-icon-nowrap">
+
+								<h4>Current List:</h4>
 								<select onChange={handleChangeList} value={lists ? selectedListID : undefined}>
 									{lists && Object.keys(lists).map((listKey) => (
 										<option key={listKey} value={listKey}>
@@ -223,9 +224,8 @@ const App = () => {
 										Edit List
 									</label>
 								}
-
 								{/* Edit List Form with its toggle */}
-								{listFormOpen && <>
+								{listFormOpen &&
 									<form className="title-with-icon" onSubmit={handleEditList}>
 										<div className="title-with-icon">
 
@@ -238,23 +238,25 @@ const App = () => {
 												Confirm Edit
 											</label>
 										</div>
-										<label className="title-with-icon button delete-color" onClick={handleDeleteList} style={{ marginTop: "10px", marginBottom: "10px" }}>
+										<label className="title-with-icon button delete-color" onClick={handleDeleteList}>
 											{selectedListID && <DeleteForever fontSize="medium" >Delete Selected Reading List</DeleteForever>}
 											Delete List
 										</label>
+										< label className="title-with-icon" onClick={() => { setListFormOpen(false); setNewListFormOpen(false); }}>
+											<Clear fontSize="medium" ></Clear>
+											Close
+										</label>
 									</form>
-									< label className="title-with-icon" onClick={() => { setListFormOpen(false); setNewListFormOpen(false); }}>
-										<Clear fontSize="medium" ></Clear>
-										Close
-									</label>
-								</>
 								}
+							</div>
+							<div>
+
 
 								{/* NEW List Form with its toggle */}
 								{
 									!(newListFormOpen || listFormOpen) &&
-									<div style={{ width: "100%" }}>
-										<label style={{ marginLeft: 0, marginRight: 0, paddingLeft: 0, paddingRight: 0 }} className="title-with-icon button add-color" onClick={() => { setListFormOpen(false); setNewListFormOpen(true) }}>
+									<div >
+										<label className="title-with-icon button add-color" onClick={() => { setListFormOpen(false); setNewListFormOpen(true) }}>
 											<AddBox fontSize="medium" ></AddBox>
 											New List
 										</label>
@@ -262,11 +264,11 @@ const App = () => {
 								}
 								{
 									newListFormOpen &&
-									<div style={{ width: "100%" }}>
+									<div >
 										<form className="title-with-icon" onSubmit={handleNewList}>
 											<label className="title-with-icon">
 												New List Name:
-												<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
+												<input type="text" placeholder="Enter New List Name Here" value={newListName} onChange={e => setNewListName(e.target.value)} />
 											</label>
 											<label className="title-with-icon button add-color" onClick={handleNewList}>
 												<AddBox fontSize="medium" ></AddBox>
