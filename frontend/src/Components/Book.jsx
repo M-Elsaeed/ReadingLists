@@ -17,7 +17,8 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 		setEditMode(true);
 	};
 
-	const handleSave = () => {
+	const handleSave = (e) => {
+		e.preventDefault();
 		onUpdate(book.isbn, newTitle, newAuthor, newStatus, book.image);
 		setEditMode(false);
 	};
@@ -59,7 +60,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 							<hr />
 						</div>
 					</>
-					<form>
+					<form onSubmit={handleSave}>
 						<div>
 							<label><b>Title: </b>
 								<input

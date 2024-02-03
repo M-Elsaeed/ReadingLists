@@ -226,7 +226,7 @@ const App = () => {
 
 								{/* Edit List Form with its toggle */}
 								{listFormOpen && <>
-									<form className="title-with-icon">
+									<form className="title-with-icon" onSubmit={handleEditList}>
 										<div className="title-with-icon">
 
 											<label className="title-with-icon">
@@ -263,7 +263,7 @@ const App = () => {
 								{
 									newListFormOpen &&
 									<div style={{ width: "100%" }}>
-										<form className="title-with-icon">
+										<form className="title-with-icon" onSubmit={handleNewList}>
 											<label className="title-with-icon">
 												New List Name:
 												<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
