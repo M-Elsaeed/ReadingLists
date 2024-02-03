@@ -5,7 +5,7 @@ import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
 import { DeleteForever, Edit, AddBox, ToggleOn, ToggleOff, ExpandMore, ExpandLess } from '@mui/icons-material';
 
-const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
+const ListsAPIEndpoint = import.meta.env.DEV && false  ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
 
 // A custom hook to fetch data from a given URL
@@ -160,6 +160,7 @@ const App = () => {
 					setLists({ ...lists })
 					setSelectedListID(Object.keys(lists)[0])
 					setError(null)
+					setListFormOpen(false)
 				})
 				.catch((err) => {
 					setError(err.message)
@@ -175,6 +176,7 @@ const App = () => {
 				setLists({ ...lists })
 				setSelectedListID(res.data.listID)
 				setError(null)
+				setNewListFormOpen(false)
 			})
 			.catch((err) => {
 				setError(err.message)
@@ -189,6 +191,7 @@ const App = () => {
 				setLists({ ...lists })
 				setSelectedListID(res.data.listID)
 				setError(null)
+				setListFormOpen(false)
 			})
 			.catch((err) => {
 				setError(err.message)
@@ -276,17 +279,17 @@ const App = () => {
 						{lists && selectedListID && lists[selectedListID] && (
 							<>
 								<h2>{lists[selectedListID].listName}</h2>
-								<div className="title-with-icon">
-									<h4>Add Book Details Manually</h4>
+								<SearchBar listID={selectedListID} onAdd={handleAddBook}></SearchBar>
+								<div className="title-with-icon" onClick={() => { setManualFormOpen(!manualFormOpen) }}>
+									<h4>(Alternative) Add Book Details Manually</h4>
 									{
 										manualFormOpen ?
-											<ExpandLess fontSize="large" onClick={() => { setManualFormOpen(!manualFormOpen) }}></ExpandLess>
+											<ExpandLess fontSize="large"></ExpandLess>
 											:
-											<ExpandMore fontSize="large" onClick={() => { setManualFormOpen(!manualFormOpen) }}></ExpandMore>
+											<ExpandMore fontSize="large"></ExpandMore>
 									}
 								</div>
 								{manualFormOpen && <BookForm listID={selectedListID} onAdd={handleAddBook} />}
-								<SearchBar listID={selectedListID} onAdd={handleAddBook}></SearchBar>
 								<BookList
 									list={lists[selectedListID]}
 									onDelete={handleDeleteBook}
