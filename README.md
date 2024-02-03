@@ -5,7 +5,7 @@
   - [What was implemented and Technologies used?](#what-was-implemented-and-technologies-used)
   - [Extra Features Implemented](#extra-features-implemented)
     - [Lists (Create, Read, Update, Delete)](#lists-create-read-update-delete)
-    - [Add thourgh Search Feature](#add-thourgh-search-feature)
+    - [Add through Search Feature](#add-through-search-feature)
     - [Automatic Testing and Deployment (CI/CD) for Backend.](#automatic-testing-and-deployment-cicd-for-backend)
     - [Light \& Dark Modes](#light--dark-modes)
 - [Backend Design](#backend-design)
@@ -55,7 +55,7 @@ Not only are CRUD operations provided for books in a single list, the App suppor
 
 <br/>
 
-### Add thourgh Search Feature
+### Add through Search Feature
 
 ![image](https://github.com/M-Elsaeed/ReadingLists/assets/33024315/993efef2-0e59-4435-8274-0e9ca076a4bd)
 
