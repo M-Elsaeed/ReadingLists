@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import useOpenLibrary from "./hooks/useOpenLibrary.js";
+import { ClearAll } from "@mui/icons-material";
 import "crypto";
 import Book from './Book.jsx';
 
@@ -25,35 +26,45 @@ const SearchBar = ({ onAdd, listID }) => {
 	};
 
 	return (
-		<div className="title-with-icon">
-			<h3>Add Books Automatically by Search: </h3>
-			<input
-				type="text"
-				value={query}
-				onChange={handleQueryChange}
-				placeholder="Enter a keyword"
-			/>
-			{loading && <p>Loading...</p>}
-			{error && <p>Error: {error}</p>}
-			{data.length > 0 && (
-				<div className="dropdown" >
-					{data.map((result) => (
-						<div
-							key={result.key}
-							className="result"
-							onClick={() => handleSelect(result)}
-						>
-							<Book
-								key={result.isbn}
-								book={result}
-								editableCard={false}
-							/>
-						</div>
-					))}
-				</div>
-			)}
-			<button onClick={handleClear}>Clear</button>
-		</div>
+		<>
+
+			<div className="title-with-icon">
+				<h4>(Recomneded) Add Books Automatically by Search: </h4>
+				<input
+					type="text"
+					value={query}
+					onChange={handleQueryChange}
+					placeholder="Enter a keyword"
+				/>
+				<label onClick={handleClear} className="title-with-icon button">
+					<ClearAll fontSize="large"></ClearAll>
+					Clear Search
+				</label>
+			</div>
+			<div>
+				{loading && <p>Loading...</p>}
+				{error && <p>Error: {error}</p>}
+				{data.length > 0 && (
+					<div className="dropdown" >
+						{data.map((result) => (
+							<div
+								key={result.key}
+								className="result"
+								onClick={() => handleSelect(result)}
+							>
+								<Book
+									key={result.isbn}
+									book={result}
+									editableCard={false}
+								/>
+							</div>
+						))}
+					</div>
+				)}
+
+
+			</div>
+		</>
 	);
 };
 

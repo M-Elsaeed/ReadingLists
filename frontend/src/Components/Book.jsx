@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./styles.css";
+import { Edit, DeleteForever, Clear, Save } from "@mui/icons-material";
 
 // A component to display a single book
 const Book = ({ book, onDelete, onUpdate, editableCard }) => {
@@ -43,16 +43,34 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 				<div className="book-info-card">
 					<div>
 						<img height="200vh" width="150vw" src={book.image ? book.image : "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}></img>
-						<div>
-							<label><b>Title: </b></label>
-							<input
-								type="text"
-								name="title"
-								value={newTitle}
-								onChange={handleChange}
-							/>
+					</div>
+					<>
+						<div style={{ width: "100%" }}>
+							<hr />
 						</div>
-						<div>
+						<div className="space-between-flex">
+							<label className="title-with-icon button add-color" onClick={handleSave}>
+								<Save fontSize="small"></Save>Save</label>
+							<label className="title-with-icon button delete-color" onClick={handleCancel}>
+								<Clear fontSize="small"></Clear>Cancel
+							</label>
+						</div>
+						<div style={{ width: "100%" }}>
+							<hr />
+						</div>
+					</>
+					<form>
+						<div className="title-with-icon">
+							<label><b>Title: </b>
+								<input
+									type="text"
+									name="title"
+									value={newTitle}
+									onChange={handleChange}
+								/>
+							</label>
+						</div>
+						<div className="title-with-icon">
 							<label><b>Author: </b></label>
 							<input
 								type="text"
@@ -61,7 +79,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 								onChange={handleChange}
 							/>
 						</div>
-						<div>
+						<div className="title-with-icon">
 							<label><b>Status: </b></label>
 							<select name="status" value={newStatus} onChange={handleChange}>
 								<option value="Unread">Unread</option>
@@ -69,9 +87,7 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 								<option value="Finished">Finished</option>
 							</select>
 						</div>
-					</div>
-					<button onClick={handleSave}>Save</button>
-					<button onClick={handleCancel}>Cancel</button>
+					</form>
 				</div>
 			) : (
 				<div className={editableCard ? "book-info-card" : "book-info-card-small"} >
@@ -79,18 +95,33 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 						<img height={editableCard ? "200vh" : "50vh"} width={editableCard ? "150vw" : "30vh"} src={book.image ? book.image : "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}></img>
 					</div>
 
-					<div>
+					{editableCard &&
+						<>
+							<div style={{ width: "100%" }}>
+								<hr />
+							</div>
+							<div className="space-between-flex">
+								<label className="title-with-icon button edit-color" onClick={handleEdit}>
+									<Edit fontSize="small">
+									</Edit>
+									Edit
+								</label>
+								<label className="title-with-icon button delete-color" onClick={handleDelete}>
+									<DeleteForever fontSize="small"></DeleteForever>
+									Delete
+								</label>
+							</div>
+							<div style={{ width: "100%" }}>
+								<hr />
+							</div>
+						</>
+					}
+					<div >
 						<p>{editableCard && <b>Title:</b>} {book.title}</p>
 						<p>{editableCard && <b>Author:</b>} {book.author}</p>
 						{editableCard && <p><b>Status:</b> {book.status}</p>}
 					</div>
 
-					{editableCard &&
-						<div>
-							<button onClick={handleEdit}>Edit</button>
-							<button onClick={handleDelete}>Delete</button>
-						</div>
-					}
 				</div>
 			)}
 		</div>

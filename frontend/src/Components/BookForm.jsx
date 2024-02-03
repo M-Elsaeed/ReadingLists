@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./styles.css";
 import { AddBox } from "@mui/icons-material";
 
 // A component to display a form to add a new book
@@ -34,9 +33,8 @@ const BookForm = ({ onAdd, listID }) => {
 	};
 
 	return (
-		<div className="book-form">
-			{/* <h2>Add a new book Manually</h2> */}
-			<form className="title-with-icon" onSubmit={handleSubmit}>
+		<div>
+			<form className="book-form" onSubmit={handleSubmit}>
 				<label htmlFor="isbn">ISBN:
 					<input
 						type="text"
@@ -47,6 +45,7 @@ const BookForm = ({ onAdd, listID }) => {
 						required
 					/>
 				</label>
+				<br></br>
 				<label htmlFor="title">Title:
 					<input
 						type="text"
@@ -57,6 +56,8 @@ const BookForm = ({ onAdd, listID }) => {
 						required
 					/>
 				</label>
+				<br></br>
+
 				<label htmlFor="author">Author:
 					<input
 						type="text"
@@ -67,6 +68,8 @@ const BookForm = ({ onAdd, listID }) => {
 						required
 					/>
 				</label>
+				<br></br>
+
 				<label htmlFor="imageURL">Cover URL:
 					<input
 						type="text"
@@ -76,6 +79,8 @@ const BookForm = ({ onAdd, listID }) => {
 						onChange={handleChange}
 					/>
 				</label>
+				<br></br>
+
 				<label htmlFor="status">Status:
 					<select
 						id="status"
@@ -89,9 +94,11 @@ const BookForm = ({ onAdd, listID }) => {
 						<option value="Finished">Finished</option>
 					</select>
 				</label>
-				<label className="title-with-icon" style={{margin: 0}}>
+				<br></br>
+
+				<label onClick={handleSubmit} className="title-with-icon button add-color" style={{ margin: 0 }}>
 					Add Book
-					<AddBox fontSize="large" onClick={handleSubmit} type="submit">Add</AddBox>
+					<AddBox fontSize="large" type="submit">Add</AddBox>
 				</label>
 			</form>
 		</div>

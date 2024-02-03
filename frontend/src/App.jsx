@@ -3,7 +3,6 @@ import axios from "axios";
 import BookList from "./Components/BookList.jsx";
 import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
-import './Components/styles.css'
 import { DeleteForever, Edit, AddBox, ToggleOn, ToggleOff, ExpandMore, ExpandLess } from '@mui/icons-material';
 
 const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
@@ -51,6 +50,7 @@ const App = () => {
 
 	useEffect(() => {
 		if (selectedListID) {
+			setEditedListName(lists[selectedListID].listName)
 			axios.get(`${ListsAPIEndpoint}/reading-lists/${selectedListID}`)
 				.then((res) => {
 					lists[selectedListID] = res.data
@@ -215,12 +215,12 @@ const App = () => {
 								{
 									!(newListFormOpen || listFormOpen) &&
 									<div className="title-with-icon">
-										<label className="title-with-icon" onClick={() => { setListFormOpen(true); setNewListFormOpen(false) }}>
-											<Edit fontSize="large" >Create a New Reading List</Edit>
+										<label className="title-with-icon button edit-color" onClick={() => { setListFormOpen(true); setNewListFormOpen(false) }}>
+											<Edit fontSize="large" ></Edit>
 											Edit List
 										</label>
-										<label className="title-with-icon" onClick={() => { setListFormOpen(false); setNewListFormOpen(true) }}>
-											<AddBox fontSize="large" >Create a New Reading List</AddBox>
+										<label className="title-with-icon button add-color" onClick={() => { setListFormOpen(false); setNewListFormOpen(true) }}>
+											<AddBox fontSize="large" ></AddBox>
 											New List
 										</label>
 									</div>
@@ -229,31 +229,33 @@ const App = () => {
 							<div>
 								{listFormOpen && <>
 									<form className="title-with-icon">
-										<label className="title-with-icon">
-											Delete List
-											{selectedListID && <DeleteForever fontSize="large" onClick={handleDeleteList}>Delete Selected Reading List</DeleteForever>}
-										</label>
+										<div className="title-with-icon">
 
-										<label className="title-with-icon">
-											Edited List Name:
-											<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
-										</label>
-										<label className="title-with-icon">
-											Confirm Edit
-											<Edit fontSize="large" onClick={handleEditList}>Confirm Edit</Edit>
+											<label className="title-with-icon">
+												Edited List Name:
+												<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
+											</label>
+											<label className="title-with-icon button edit-color" onClick={handleEditList}>
+												<Edit fontSize="large" ></Edit>
+												Confirm Edit
+											</label>
+										</div>
+										<label className="title-with-icon button delete-color" onClick={handleDeleteList} style={{ marginTop: "10px", marginBottom: "10px" }}>
+											{selectedListID && <DeleteForever fontSize="large" >Delete Selected Reading List</DeleteForever>}
+											Delete List
 										</label>
 									</form>
 								</>
 								}
 								{
 									newListFormOpen &&
-									<form>
-										<label>
+									<form className="title-with-icon">
+										<label className="title-with-icon">
 											New List Name:
 											<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
 										</label>
-										<label className="title-with-icon" onClick={handleNewList}>
-											<AddBox fontSize="large" >Create a New Reading List</AddBox>
+										<label className="title-with-icon button add-color" onClick={handleNewList}>
+											<AddBox fontSize="large" ></AddBox>
 											Create a New Reading List
 										</label>
 									</form>
