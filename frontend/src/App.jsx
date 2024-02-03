@@ -5,37 +5,13 @@ import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
 import { DeleteForever, Edit, AddBox, ToggleOn, ToggleOff, ExpandMore, ExpandLess } from '@mui/icons-material';
 
-const ListsAPIEndpoint = import.meta.env.DEV && false  ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
+const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
-
-// A custom hook to fetch data from a given URL
-const useFetch = (url) => {
-	const [data, setData] = useState(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-
-	const fetchData = async () => {
-		try {
-			const response = await axios.get(url);
-			setData(response.data);
-			setLoading(false);
-		} catch (err) {
-			setError(err.message);
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchData();
-	}, [url]);
-
-	return { data, loading, error };
-};
 
 
 // A component to display the CRUD app
 const App = () => {
-	const [lists, setLists] = useState(null);
+	const [lists, setLists] = useState({});
 	const [selectedListID, setSelectedListID] = useState(null);
 	const [error, setError] = useState(null);
 	const [newListName, setNewListName] = useState("Your new list name");
@@ -43,14 +19,31 @@ const App = () => {
 	const [listFormOpen, setListFormOpen] = useState(false);
 	const [manualFormOpen, setManualFormOpen] = useState(false);
 	const [newListFormOpen, setNewListFormOpen] = useState(false);
-
+	const [loading, setLoading] = useState(true)
+	const [listsInfo, setListsInfo] = useState({})
 
 	// Fetch the data from the API
-	const { data, loading } = useFetch(`${ListsAPIEndpoint}/reading-lists-info`);
+	const fetchListsInfo = () => {
+		axios.get(`${ListsAPIEndpoint}/reading-lists-info`)
+			.then((response) => {
+				setListsInfo(response.data)
+				setLoading(false)
+				if (!selectedListID) {
+					setSelectedListID(Object.keys(response.data)[0]);
+				}
+			})
+			.catch((err) => {
+				console.log("ERRORRREDDD")
+				console.log(err)
+				setError(err)
+				setLoading(false)
+			})
+	}
+
+	useEffect(fetchListsInfo, [])
 
 	useEffect(() => {
 		if (selectedListID) {
-			setEditedListName(lists[selectedListID].listName)
 			axios.get(`${ListsAPIEndpoint}/reading-lists/${selectedListID}`)
 				.then((res) => {
 					lists[selectedListID] = res.data
@@ -61,13 +54,6 @@ const App = () => {
 				})
 		}
 	}, [selectedListID])
-	// Initialize the lists state with the fetched data
-	useEffect(() => {
-		if (data) {
-			setLists(data);
-			setSelectedListID(Object.keys(data)[0]);
-		}
-	}, [data]);
 
 	// Handle adding a new book to the selected list
 	const handleAddBook = async (listID, isbn, title, author, status, image) => {
@@ -161,6 +147,7 @@ const App = () => {
 					setSelectedListID(Object.keys(lists)[0])
 					setError(null)
 					setListFormOpen(false)
+					fetchListsInfo()
 				})
 				.catch((err) => {
 					setError(err.message)
@@ -177,6 +164,7 @@ const App = () => {
 				setSelectedListID(res.data.listID)
 				setError(null)
 				setNewListFormOpen(false)
+				fetchListsInfo()
 			})
 			.catch((err) => {
 				setError(err.message)
@@ -192,6 +180,7 @@ const App = () => {
 				setSelectedListID(res.data.listID)
 				setError(null)
 				setListFormOpen(false)
+				fetchListsInfo()
 			})
 			.catch((err) => {
 				setError(err.message)
@@ -201,20 +190,22 @@ const App = () => {
 	return (
 		<div className="app">
 			{
-				loading ? <p>Loading</p> :
+				loading ? <div style={{ textAlign: "center" }}>Loading</div> :
 					<>
 						<h1>My Reading Lists</h1>
 						<hr />
 						<div>
 							<div className="title-with-icon">
 								<h3>Current List:</h3>
-								<select onChange={handleChangeList} value={lists ? selectedListID : undefined}>
-									{lists && Object.keys(lists).map((listKey) => (
-										<option key={listKey} value={listKey}>
-											{lists[listKey].listName}
-										</option>
-									))}
-								</select>
+								{
+									<select onClick={fetchListsInfo} onChange={handleChangeList} value={listsInfo && selectedListID ? selectedListID : undefined}>
+										{listsInfo && Object.keys(listsInfo).map((listKey) => (
+											<option key={listKey} value={listKey}>
+												{listsInfo[listKey].listName}
+											</option>
+										))}
+									</select>
+								}
 								{
 									!(newListFormOpen || listFormOpen) &&
 									<div className="title-with-icon">
@@ -275,7 +266,7 @@ const App = () => {
 
 						<hr />
 
-						{error && <p className="error">{error}</p>}
+						{error && <p className="error">{error.message ? error.message : error}</p>}
 						{lists && selectedListID && lists[selectedListID] && (
 							<>
 								<h2>{lists[selectedListID].listName}</h2>
