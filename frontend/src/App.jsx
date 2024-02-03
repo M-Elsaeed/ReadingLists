@@ -5,7 +5,7 @@ import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
 import { DeleteForever, Edit, AddBox, ToggleOn, ToggleOff, ExpandMore, ExpandLess } from '@mui/icons-material';
 
-const ListsAPIEndpoint = import.meta.env.DEV && false  ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
+const ListsAPIEndpoint = import.meta.env.DEV  ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
 
 // A custom hook to fetch data from a given URL
