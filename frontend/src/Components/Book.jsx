@@ -50,9 +50,9 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 						</div>
 						<div className="space-between-flex">
 							<label className="title-with-icon button add-color" onClick={handleSave}>
-								<Save fontSize="small"></Save>Save</label>
+								<Save fontSize="medium"></Save>Save</label>
 							<label className="title-with-icon button delete-color" onClick={handleCancel}>
-								<Clear fontSize="small"></Clear>Cancel
+								<Clear fontSize="medium"></Clear>Cancel
 							</label>
 						</div>
 						<div style={{ width: "100%" }}>
@@ -102,12 +102,12 @@ const Book = ({ book, onDelete, onUpdate, editableCard }) => {
 							</div>
 							<div className="space-between-flex">
 								<label className="title-with-icon button edit-color" onClick={handleEdit}>
-									<Edit fontSize="small">
+									<Edit fontSize="medium">
 									</Edit>
 									Edit
 								</label>
 								<label className="title-with-icon button delete-color" onClick={handleDelete}>
-									<DeleteForever fontSize="small"></DeleteForever>
+									<DeleteForever fontSize="medium"></DeleteForever>
 									Delete
 								</label>
 							</div>

@@ -37,7 +37,7 @@ const SearchBar = ({ onAdd, listID }) => {
 					placeholder="Enter a keyword"
 				/>
 				<label onClick={handleClear} className="title-with-icon button">
-					<ClearAll fontSize="large"></ClearAll>
+					<ClearAll fontSize="medium"></ClearAll>
 					Clear Search
 				</label>
 			</div>

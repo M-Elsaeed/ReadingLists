@@ -219,11 +219,11 @@ const App = () => {
 									!(newListFormOpen || listFormOpen) &&
 									<div className="title-with-icon">
 										<label className="title-with-icon button edit-color" onClick={() => { setListFormOpen(true); setNewListFormOpen(false) }}>
-											<Edit fontSize="large" ></Edit>
+											<Edit fontSize="medium" ></Edit>
 											Edit List
 										</label>
 										<label className="title-with-icon button add-color" onClick={() => { setListFormOpen(false); setNewListFormOpen(true) }}>
-											<AddBox fontSize="large" ></AddBox>
+											<AddBox fontSize="medium" ></AddBox>
 											New List
 										</label>
 									</div>
@@ -239,12 +239,12 @@ const App = () => {
 												<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
 											</label>
 											<label className="title-with-icon button edit-color" onClick={handleEditList}>
-												<Edit fontSize="large" ></Edit>
+												<Edit fontSize="medium" ></Edit>
 												Confirm Edit
 											</label>
 										</div>
 										<label className="title-with-icon button delete-color" onClick={handleDeleteList} style={{ marginTop: "10px", marginBottom: "10px" }}>
-											{selectedListID && <DeleteForever fontSize="large" >Delete Selected Reading List</DeleteForever>}
+											{selectedListID && <DeleteForever fontSize="medium" >Delete Selected Reading List</DeleteForever>}
 											Delete List
 										</label>
 									</form>
@@ -258,7 +258,7 @@ const App = () => {
 											<input type="text" value={newListName} onChange={e => setNewListName(e.target.value)} />
 										</label>
 										<label className="title-with-icon button add-color" onClick={handleNewList}>
-											<AddBox fontSize="large" ></AddBox>
+											<AddBox fontSize="medium" ></AddBox>
 											Create a New Reading List
 										</label>
 									</form>
@@ -266,7 +266,7 @@ const App = () => {
 								{
 									(newListFormOpen || listFormOpen) &&
 									< label className="title-with-icon" onClick={() => { setListFormOpen(false); setNewListFormOpen(false); }}>
-										<ExpandLess fontSize="large" ></ExpandLess>
+										<ExpandLess fontSize="medium" ></ExpandLess>
 										Close
 									</label>
 								}
@@ -284,9 +284,9 @@ const App = () => {
 									<h4>(Alternative) Add Book Details Manually</h4>
 									{
 										manualFormOpen ?
-											<ExpandLess fontSize="large"></ExpandLess>
+											<ExpandLess fontSize="medium"></ExpandLess>
 											:
-											<ExpandMore fontSize="large"></ExpandMore>
+											<ExpandMore fontSize="medium"></ExpandMore>
 									}
 								</div>
 								{manualFormOpen && <BookForm listID={selectedListID} onAdd={handleAddBook} />}
