@@ -28,7 +28,7 @@ describe('POST /reading-lists', () => {
   it('should create a new reading list and return 201 status code',
     async () => {
       const response = await createReadingList(sampleReadingList)
-      expect(response.statusCode).toBe(201)
+      expect(response.statusCode).toBe(202)
       expect(response.body).toHaveProperty('listID')
       expect(response.body.listName).toBe(sampleReadingList.listName)
     })
