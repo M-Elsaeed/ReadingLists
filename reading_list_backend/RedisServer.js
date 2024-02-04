@@ -42,8 +42,8 @@ app.post('/reading-lists', (req, res) => {
 
 	const listID = randomUUID()
 	let operations = [
-		client.json.set(readingListsKeyName, `$.${listID}`, { listName: listName, books: {} }),
-		client.json.set(readingListsInfoKeyName, `$.${listID}`, { listName: listName })
+		client.json.set(readingListsKeyName, `$.${listID}`, { listName: listName, books: {} }, { NX: true }),
+		client.json.set(readingListsInfoKeyName, `$.${listID}`, { listName: listName }, { NX: true })
 	]
 	Promise.all(operations)
 		.then(() => res.status(201).send({ listID, listName }))
@@ -86,8 +86,8 @@ app.put('/reading-lists/:listID', (req, res) => {
 	if (!listName) return res.status(400).send({ message: 'List Name is required' })
 
 	let operations = [
-		client.json.set(readingListsKeyName, `$.${listID}.listName`, listName),
-		client.json.set(readingListsInfoKeyName, `$.${listID}`, { listName: listName })
+		client.json.set(readingListsKeyName, `$.${listID}.listName`, listName, { XX: true }),
+		client.json.set(readingListsInfoKeyName, `$.${listID}`, { listName: listName }, { XX: true })
 	]
 	Promise.all(operations)
 		.then((results) => {

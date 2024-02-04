@@ -1,4 +1,3 @@
-// Import the required modules
 const request = require('supertest')
 const app = require('./RedisServer')
 
@@ -37,6 +36,7 @@ describe('POST /reading-lists', () => {
     async () => {
       const response = await createReadingList({ listName: '' })
       expect(response.statusCode).toBe(400)
+      expect(response.body).toHaveProperty('message')
     })
 })
 
@@ -67,11 +67,8 @@ describe('GET /reading-lists/:listID', () => {
     async () => {
       // Create a reading list in the database
       const readingList = await createReadingList(sampleReadingList)
-      // console.log(readingList)
       const response = await request(app).get(`/reading-lists/${readingList.body.listID}`)
       expect(response.statusCode).toBe(200)
-      // expect(response.body).toHaveProperty('listID')
-      // expect(response.body.listID).toBe(readingList.listID)
       expect(response.body.listName).toBe(readingList.body.listName)
     })
 
@@ -79,7 +76,7 @@ describe('GET /reading-lists/:listID', () => {
     async () => {
       const response = await request(app).get('/reading-lists/999')
       expect(response.statusCode).toBe(404)
-      // expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
     })
 })
 
@@ -89,15 +86,9 @@ describe('PUT /reading-lists/:listID', () => {
     async () => {
       // Create a reading list in the database
       const readingList = await createReadingList(sampleReadingList)
-
       // Update the reading list name
       const newName = 'My Updated Reading List'
-
-      const response = await request(app)
-        .put(`/reading-lists/${readingList.body.listID}`)
-        .send({ listName: newName })
-
-
+      const response = await request(app).put(`/reading-lists/${readingList.body.listID}`).send({ listName: newName })
       expect(response.statusCode).toBe(200)
       expect(response.body).toHaveProperty('listID')
       expect(response.body.listID).toBe(readingList.body.listID)
@@ -106,26 +97,16 @@ describe('PUT /reading-lists/:listID', () => {
 
   it('should return 400 status code if the listID or name is missing or invalid',
     async () => {
-
-      const response = await request(app)
-        .put('/reading-lists/')
-        .send({ listName: '' })
-
-      expect(response.statusCode).toBe(404)
-
-      // expect(response.body).toHaveProperty('error')
+      const response = await request(app).put('/reading-lists/999').send({ listName: '' })
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toHaveProperty('message')
     })
 
   it('should return 404 status code if the reading list does not exist',
     async () => {
-
-      const response = await request(app)
-        .put('/reading-lists/999')
-        .send({ listName: 'Nonexistent Reading List' })
-
+      const response = await request(app).put('/reading-lists/999').send({ listName: 'Nonexistent Reading List' })
       expect(response.statusCode).toBe(404)
-
-      // expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
     })
 })
 
@@ -135,28 +116,17 @@ describe('DELETE /reading-lists/:listID', () => {
     async () => {
       // Create a reading list in the database
       const readingList = await createReadingList(sampleReadingList)
-
-
       const response = await request(app).delete(`/reading-lists/${readingList.body.listID}`)
-
       expect(response.statusCode).toBe(204)
-
       const listResponse = await request(app).get(`/reading-lists/${readingList.body.listID}`)
-
       expect(listResponse.statusCode).toBe(404)
-
-
-
     })
 
   it('should return 404 status code if the reading list does not exist',
     async () => {
-
       const response = await request(app).delete('/reading-lists/999')
-
       expect(response.statusCode).toBe(404)
-
-      // expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
     })
 })
 
@@ -166,10 +136,7 @@ describe('POST /reading-lists/:listID/books', () => {
     async () => {
       // Create a reading list in the database
       const readingList = await createReadingList(sampleReadingList)
-      let response = await request(app)
-        .post(`/reading-lists/${readingList.body.listID}/books`)
-        .send({ book: sampleBook })
-
+      let response = await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
       expect(response.statusCode).toBe(201)
       const listResponse = await request(app).get(`/reading-lists/${readingList.body.listID}`)
       expect(listResponse.body.books[sampleBook.isbn].isbn).toBe(sampleBook.isbn)
@@ -183,27 +150,16 @@ describe('POST /reading-lists/:listID/books', () => {
     async () => {
       // Create a reading list in the database
       const readingList = await createReadingList(sampleReadingList)
-
-
-      const response = await request(app)
-        .post(`/reading-lists/${readingList.listID}/books`)
-        .send({ book: {} })
-
+      const response = await request(app).post(`/reading-lists/${readingList.listID}/books`).send({ book: {} })
       expect(response.statusCode).toBe(400)
-
-      // expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
     })
 
   it('should return 404 status code if the reading list does not exist',
     async () => {
-
-      const response = await request(app)
-        .post('/reading-lists/999/books')
-        .send({ book: sampleBook })
-
+      const response = await request(app).post('/reading-lists/999/books').send({ book: sampleBook })
       expect(response.statusCode).toBe(404)
-
-      // expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
     })
 })
 
@@ -213,9 +169,7 @@ describe('GET /reading-lists/:listID/books/:ISBN', () => {
     async () => {
       // Create a reading list and a book in the database
       const readingList = await createReadingList(sampleReadingList)
-
-      const createdBook = await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
-
+      await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
       const response = await request(app).get(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`)
       expect(response.statusCode).toBe(200)
       expect(response.body.isbn).toBe(sampleBook.isbn)
@@ -227,14 +181,9 @@ describe('GET /reading-lists/:listID/books/:ISBN', () => {
 
   it('should return 404 status code if the reading list or the book does not exist',
     async () => {
-
-      const response = await request(app).get(
-        '/reading-lists/999/books/978-0-123456-47-2'
-      )
-
+      const response = await request(app).get('/reading-lists/999/books/978-0-123456-47-2')
       expect(response.statusCode).toBe(404)
-
-      // expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
     })
 })
 
@@ -266,8 +215,7 @@ describe('PUT /reading-lists/:listID/books/:ISBN', () => {
       await request(app).post(`/reading-lists/${readingList.body.listID}/books`).send({ book: sampleBook })
       const response = await request(app).put(`/reading-lists/${readingList.body.listID}/books/${sampleBook.isbn}`).send({ book: {} })
       expect(response.statusCode).toBe(400)
-
-      // expect(response.body).toHaveProperty('error')
+      expect(response.body).toHaveProperty('message')
 
     })
 
@@ -275,7 +223,7 @@ describe('PUT /reading-lists/:listID/books/:ISBN', () => {
     async () => {
       const response = await request(app).put("/reading-lists/999/books/978-0-123456-47-2").send({ book: sampleBook })
       expect(response.statusCode).toBe(404)
-      // expect(response.body).toHaveProperty("error")
+      expect(response.body).toHaveProperty("message")
     })
 })
 
