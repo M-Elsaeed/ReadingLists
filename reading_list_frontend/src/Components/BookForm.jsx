@@ -22,7 +22,7 @@ const BookForm = ({ onAdd, listID }) => {
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		if (name === "isbn") {
-			setIsbn(value);
+			setIsbn(value.trim().replace(/[^a-z0-9]/gi, ''));
 		} else if (name === "title") {
 			setTitle(value);
 		} else if (name === "author") {
@@ -35,7 +35,7 @@ const BookForm = ({ onAdd, listID }) => {
 	return (
 		<div>
 			<form className="book-form" onSubmit={handleSubmit}>
-				<label htmlFor="isbn">ISBN:
+				<label htmlFor="isbn">*ISBN:
 					<input
 						type="text"
 						id="isbn"
@@ -43,10 +43,12 @@ const BookForm = ({ onAdd, listID }) => {
 						value={isbn}
 						onChange={handleChange}
 						required
+						// Patter is enforced in handle change.
+						placeholder="ISBN (Alphanumeric Only)..."
 					/>
 				</label>
 				<br></br>
-				<label htmlFor="title">Title:
+				<label htmlFor="title">*Title:
 					<input
 						type="text"
 						id="title"
@@ -54,11 +56,12 @@ const BookForm = ({ onAdd, listID }) => {
 						value={title}
 						onChange={handleChange}
 						required
+						placeholder="Enter book title here..."
 					/>
 				</label>
 				<br></br>
 
-				<label htmlFor="author">Author:
+				<label htmlFor="author">*Author:
 					<input
 						type="text"
 						id="author"
@@ -66,6 +69,7 @@ const BookForm = ({ onAdd, listID }) => {
 						value={author}
 						onChange={handleChange}
 						required
+						placeholder="Enter book author here..."
 					/>
 				</label>
 				<br></br>
@@ -77,11 +81,12 @@ const BookForm = ({ onAdd, listID }) => {
 						name="imageURL"
 						value={imageURL}
 						onChange={handleChange}
+						placeholder="Enter book cover URL here..."
 					/>
 				</label>
 				<br></br>
 
-				<label htmlFor="status">Status:
+				<label htmlFor="status">*Status:
 					<select
 						id="status"
 						name="status"

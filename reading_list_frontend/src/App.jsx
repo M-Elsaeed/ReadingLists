@@ -5,7 +5,7 @@ import BookForm from "./Components/BookForm.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
 import { DeleteForever, Edit, AddBox, ExpandMore, ExpandLess, Clear } from '@mui/icons-material';
 
-const ListsAPIEndpoint = "https://readinglists.onrender.com";
+const ListsAPIEndpoint = import.meta.env.DEV ? "http://127.0.0.1:3000" : "https://readinglists.onrender.com";
 console.log(ListsAPIEndpoint)
 
 // A custom hook to fetch data from a given URL
@@ -20,7 +20,7 @@ const useFetch = (url) => {
 			setData(response.data);
 			setLoading(false);
 		} catch (err) {
-			setError(err.message);
+			setError(err.response?.data?.message ? err.response.data.message : err.message);
 			setLoading(false);
 		}
 	};
@@ -57,7 +57,7 @@ const App = () => {
 					setLists({ ...lists })
 				})
 				.catch((err) => {
-					setError(err.message)
+					setError(err.response?.data?.message ? err.response.data.message : err.message)
 				})
 		}
 	}, [selectedListID])
@@ -99,7 +99,7 @@ const App = () => {
 			})
 			.catch((err) => {
 				// Clear the error state
-				setError(err.message);
+				setError(err.response?.data?.message ? err.response.data.message : err.message);
 			});
 	};
 
@@ -114,7 +114,7 @@ const App = () => {
 			delete lists[selectedListID].books[isbn];
 			setLists({ ...lists });
 		} catch (err) {
-			setError(err.message);
+			setError(err.response?.data?.message ? err.response.data.message : err.message);
 		}
 	};
 
@@ -139,7 +139,7 @@ const App = () => {
 			lists[selectedListID].books[isbn] = newBook;
 			setLists({ ...lists });
 		} catch (err) {
-			setError(err.message);
+			setError(err.response?.data?.message ? err.response.data.message : err.message);
 		}
 	};
 
@@ -163,7 +163,7 @@ const App = () => {
 					setListFormOpen(false)
 				})
 				.catch((err) => {
-					setError(err.message)
+					setError(err.response?.data?.message ? err.response.data.message : err.message)
 				})
 		}
 	};
@@ -179,7 +179,7 @@ const App = () => {
 				setNewListFormOpen(false)
 			})
 			.catch((err) => {
-				setError(err.message)
+				setError(err.response?.data?.message ? err.response.data.message : err.message)
 			})
 	}
 
@@ -194,7 +194,7 @@ const App = () => {
 				setListFormOpen(false)
 			})
 			.catch((err) => {
-				setError(err.message)
+				setError(err.response?.data?.message ? err.response.data.message : err.message)
 			})
 	}
 
@@ -231,7 +231,7 @@ const App = () => {
 
 											<label className="title-with-icon">
 												Edited List Name:
-												<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} />
+												<input type="text" value={editedListName} onChange={e => setEditedListName(e.target.value)} placeholder="Enter Edited List Name" />
 											</label>
 											<label className="title-with-icon button edit-color" onClick={handleEditList}>
 												<Edit fontSize="medium" ></Edit>
